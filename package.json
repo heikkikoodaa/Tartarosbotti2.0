@@ -4,9 +4,7 @@
   "description": "Discord community bot to handle automatic stream announcements",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon main.js",
-    "eslint": "eslint . --fix"
+    "start": "nodemon main.js"
   },
   "author": "Heikki R",
   "license": "ISC",

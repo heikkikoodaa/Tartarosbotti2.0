@@ -1,5 +1,6 @@
 const { client } = require('./configs/bot_config')
 const { BOT_TOKEN } = require('./configs/constants')
+const { startApp } = require('./app/server')
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`)
@@ -20,3 +21,4 @@ client.on('presenceUpdate', (oldPresence, newPresence) => {
 })
 
 client.login(BOT_TOKEN)
+startApp()

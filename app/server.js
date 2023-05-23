@@ -1,10 +1,14 @@
 const express = require('express')
 const mongoose = require('mongoose')
-const { MONGO_URL } = require('./configs/constants')
+const { MONGO_URL } = require('../configs/constants')
+const users = require('./routes/users')
 
 const app = express()
-
 const PORT = process.env.PORT || 3000
+
+app.use('/users', users)
+
+console.log('BOT', MONGO_URL)
 
 mongoose
   .connect(MONGO_URL, {
@@ -14,10 +18,8 @@ mongoose
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.log(err))
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
-
-app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`)
-})
+module.exports = {
+  startApp: () => {
+    app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`))
+  },
+}
