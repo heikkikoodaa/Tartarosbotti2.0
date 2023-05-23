@@ -28,16 +28,24 @@ client.on('messageCreate', async (msg) => {
   if (msg.content === '!test') {
     try {
       const { data } = await axios.get(`${BACKEND_URL}/users`)
-      if (data.length === 0) {
-        msg.reply('No users found')
-      } else {
-        msg.reply(`Found ${data.length} users`)
-      }
+      msg.reply({ content: data, ephemeral: true })
     } catch (error) {
-      msg.reply('Error getting users from backend')
+      if (error.response.status === 404) {
+        msg.reply({ content: 'No users found', ephemeral: true })
+        return
+      } else {
+        msg.reply({
+          content: 'Something went wrong. Please try again later.',
+          ephemeral: true,
+        })
+        return
+      }
     }
   }
 })
 
+// Login to Discord
 client.login(BOT_TOKEN)
+
+// Start Express server
 startApp()
