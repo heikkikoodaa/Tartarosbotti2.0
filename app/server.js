@@ -8,8 +8,6 @@ const PORT = process.env.PORT || 3000
 
 app.use('/users', users)
 
-console.log('BOT', MONGO_URL)
-
 mongoose
   .connect(MONGO_URL, {
     useNewUrlParser: true,
