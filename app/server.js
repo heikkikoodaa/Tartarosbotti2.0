@@ -7,6 +7,7 @@ const app = express()
 const PORT = process.env.PORT || 3000
 
 app.use('/users', users)
+app.use(express.json())
 
 mongoose
   .connect(MONGO_URL, {
