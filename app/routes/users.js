@@ -6,11 +6,13 @@ router.get('/:id', async (req, res) => {
   // Get user by id
   const user = await User.findOne({ discordId: req.params.id }).lean()
 
+  // If user does not exist, return error
   if (!user) {
     res.send({ success: false, message: 'User not found' })
     return
   }
 
+  // If user exists, return user
   res.send({ success: true, user: user })
 })
 
