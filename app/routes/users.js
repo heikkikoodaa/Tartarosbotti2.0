@@ -2,21 +2,53 @@ const express = require('express')
 const router = express.Router()
 const User = require('../models/user')
 
-const getAllUsers = async () => {
-  const userlist = await User.find()
-  return userlist
-}
+router.get('/:id', async (req, res) => {
+  // Get user by id
+  const user = await User.findOne({ discordId: req.params.id }).lean()
 
-router.get('/', async (req, res) => {
-  // Get all users from DB
-  const users = await getAllUsers()
-
-  if (users.length === 0) {
-    res.status(404).send('No users found')
+  if (!user) {
+    res.send({ success: false, message: 'User not found' })
     return
   }
 
-  res.status(200).send(users)
+  res.send({ success: true, user: user })
+})
+
+router.post('/', async (req, res) => {
+  // Create new user
+  const { discordId, username } = req.body
+
+  if (!discordId || !username) {
+    res.send({ success: false, message: 'Missing required fields' })
+    return
+  }
+
+  const newUser = new User({
+    discordId: discordId,
+    username: username,
+  })
+
+  try {
+    await newUser.save()
+    res.send({ success: true, message: 'User created' })
+  } catch (error) {
+    res.send({ success: false, message: 'User could not be created' })
+  }
+})
+
+router.patch('/:id', async (req, res) => {
+  const { isStreaming } = req.body
+
+  try {
+    // Update user stream status
+    await User.findOneAndUpdate(
+      { discordId: req.params.id },
+      { isStreaming: isStreaming },
+    )
+    res.send({ success: true, message: 'Stream status updated' })
+  } catch (error) {
+    res.send({ success: false, message: 'Stream status could not be updated' })
+  }
 })
 
 module.exports = router
