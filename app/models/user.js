@@ -6,7 +6,11 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
-  username: String,
+  username: {
+    type: String,
+    required: true,
+  },
+  streamAmount: [Object],
   twitchUrl: String,
   isStreaming: {
     type: Boolean,
