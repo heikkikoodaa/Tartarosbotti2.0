@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const { Schema } = mongoose
 
 const userSchema = new Schema({
+  avatar: String,
   discordId: {
     type: String,
     required: true,
@@ -11,7 +12,10 @@ const userSchema = new Schema({
     required: true,
   },
   streamAmount: [Object],
-  twitchUrl: String,
+  twitchUrl: {
+    type: String,
+    default: '',
+  },
   isStreaming: {
     type: Boolean,
     default: false,
