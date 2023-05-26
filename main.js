@@ -15,6 +15,7 @@ client.on('presenceUpdate', (oldPresence, newPresence) => {
 })
 
 client.on('interactionCreate', async (interaction) => {
+  // Ignore if interaction is not a command
   if (!interaction.isCommand()) return
 
   const command = interaction.client.commands.get(interaction.commandName)
@@ -26,6 +27,7 @@ client.on('interactionCreate', async (interaction) => {
 
   try {
     await command.execute(interaction)
+    console.log(`Command ${interaction.commandName} executed successfully`)
   } catch (error) {
     console.error(error)
     if (interaction.replied || interaction.deferred) {
