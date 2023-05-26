@@ -1,5 +1,5 @@
 const { REST, Routes } = require('discord.js')
-const { BOT_ID, GUILD_ID, BOT_TOKEN } = require('./configs/constants')
+const { BOT_ID, BOT_TOKEN } = require('./configs/constants')
 const fs = require('node:fs')
 const path = require('node:path')
 
@@ -23,27 +23,26 @@ for (const folder of commandFolders) {
   }
 }
 
-const rest = new REST({ version: '9' }).setToken(BOT_TOKEN)
+const rest = new REST({ version: '10' }).setToken(BOT_TOKEN)
 
-;(async () => {
+const deployCommands = async () => {
   try {
     console.log('Started refreshing application (/) commands.')
 
-    try {
-      await rest.put(Routes.applicationGuildCommands(BOT_ID, GUILD_ID), {
-        body: [],
-      })
+    // Clear all commands
+    await rest.put(Routes.applicationCommands(BOT_ID), {
+      body: [],
+    })
 
-      await rest.put(Routes.applicationGuildCommands(BOT_ID, GUILD_ID), {
-        body: commands,
-      })
-
-    } catch (error) {
-      console.error(error)
-    }
+    // Set all commands
+    await rest.put(Routes.applicationCommands(BOT_ID), {
+      body: commands,
+    })
 
     console.log('Successfully reloaded application (/) commands.')
   } catch (error) {
     console.error(error)
   }
-})()
+}
+
+deployCommands()

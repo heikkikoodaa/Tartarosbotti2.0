@@ -14,6 +14,34 @@ client.on('presenceUpdate', (oldPresence, newPresence) => {
   handlePresence(oldPresence, newPresence)
 })
 
+client.on('interactionCreate', async (interaction) => {
+  if (!interaction.isCommand()) return
+
+  const command = interaction.client.commands.get(interaction.commandName)
+
+  if (!command) {
+    console.error(`Command ${interaction.commandName} not found`)
+    return
+  }
+
+  try {
+    await command.execute(interaction)
+  } catch (error) {
+    console.error(error)
+    if (interaction.replied || interaction.deferred) {
+      interaction.followUp({
+        content: 'There was an error while executing this command!',
+        ephemeral: true,
+      })
+    } else {
+      interaction.reply({
+        content: 'There was an error while executing this command!',
+        ephemeral: true,
+      })
+    }
+  }
+})
+
 client.on('messageCreate', async (msg) => {
   // Ignore if message is from bot
   if (msg.author.bot) return
