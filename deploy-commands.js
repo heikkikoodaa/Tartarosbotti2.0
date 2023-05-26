@@ -1,5 +1,5 @@
 const { REST, Routes } = require('discord.js')
-const { BOT_ID, BOT_TOKEN } = require('./configs/constants')
+const { BOT_ID, BOT_TOKEN, GUILD_ID } = require('./configs/constants')
 const fs = require('node:fs')
 const path = require('node:path')
 
@@ -30,12 +30,12 @@ const deployCommands = async () => {
     console.log('Started refreshing application (/) commands.')
 
     // Clear all commands
-    await rest.put(Routes.applicationCommands(BOT_ID), {
+    await rest.put(Routes.applicationGuildCommands(BOT_ID, GUILD_ID), {
       body: [],
     })
 
     // Set all commands
-    await rest.put(Routes.applicationCommands(BOT_ID), {
+    await rest.put(Routes.applicationGuildCommands(BOT_ID, GUILD_ID), {
       body: commands,
     })
 
