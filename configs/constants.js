@@ -1,7 +1,9 @@
 require('dotenv').config()
 
-// Get the bot token from the .env file
+// Get the bot related constants from the .env file
 const BOT_TOKEN = process.env.BOT_TOKEN
+const BOT_ID = process.env.BOT_ID
+const GUILD_ID = process.env.GUILD_ID
 
 // Get the MongoDB URL from the .env file
 const MONGO_URL = process.env.MONGO_URL
@@ -14,4 +16,6 @@ module.exports = {
   BOT_TOKEN,
   MONGO_URL,
   BACKEND_URL,
+  BOT_ID,
+  GUILD_ID,
 }
