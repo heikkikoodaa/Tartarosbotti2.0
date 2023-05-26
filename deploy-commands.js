@@ -16,22 +16,31 @@ for (const folder of commandFolders) {
     const filePath = path.join(commandsPath, file)
     const command = require(filePath)
     if ('data' in command && 'execute' in command) {
-      commands.push(command.data.toJSON())
+      commands.push(command.data)
     } else {
       console.log(`Error in ${filePath}`)
     }
   }
 }
 
-const rest = new REST({ version: '9' }).setToken(BOT_TOKEN);
+const rest = new REST({ version: '9' }).setToken(BOT_TOKEN)
 
-(async () => {
+;(async () => {
   try {
     console.log('Started refreshing application (/) commands.')
 
-    await rest.put(Routes.applicationGuildCommands(BOT_ID, GUILD_ID), {
-      body: commands,
-    })
+    try {
+      await rest.put(Routes.applicationGuildCommands(BOT_ID, GUILD_ID), {
+        body: [],
+      })
+
+      await rest.put(Routes.applicationGuildCommands(BOT_ID, GUILD_ID), {
+        body: commands,
+      })
+
+    } catch (error) {
+      console.error(error)
+    }
 
     console.log('Successfully reloaded application (/) commands.')
   } catch (error) {
