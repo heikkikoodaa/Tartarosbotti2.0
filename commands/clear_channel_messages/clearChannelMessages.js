@@ -1,12 +1,13 @@
 const { SlashCommandBuilder } = require('@discordjs/builders')
 
+// eslint-disable-next-line no-unused-vars
 const permissions = (1 << 5).toString()
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('clear-channel-messages')
     .setDescription('Clears all of the channel messages')
-    .setDefaultMemberPermissions(permissions)
+    .setDefaultMemberPermissions(0)
     .addChannelOption((option) =>
       option
         .setName('channel')

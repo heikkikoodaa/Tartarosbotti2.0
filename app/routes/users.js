@@ -3,6 +3,9 @@ const router = express.Router()
 const User = require('../models/user')
 
 router.get('/:id', async (req, res) => {
+  // If id is not given, stop execution
+  if (!req.params.id) return
+
   // Get user by id
   const user = await User.findOne({ discordId: req.params.id }).lean()
 
@@ -18,7 +21,7 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   // Create new user
-  const { discordId, username } = req.body
+  const { discordId, username, twitchUrl } = req.body
 
   if (!discordId || !username) {
     res.send({ success: false, message: 'Missing required fields' })
@@ -28,6 +31,7 @@ router.post('/', async (req, res) => {
   const newUser = new User({
     discordId: discordId,
     username: username,
+    twitchUrl: twitchUrl,
   })
 
   try {
@@ -45,7 +49,7 @@ router.patch('/:id', async (req, res) => {
     // Update user stream status
     await User.findOneAndUpdate(
       { discordId: req.params.id },
-      { isStreaming: isStreaming },
+      { isStreaming: isStreaming, $inc: { streamAmount: 1 } },
     )
     res.send({ success: true, message: 'Stream status updated' })
   } catch (error) {

@@ -29,14 +29,14 @@ const deployCommands = async () => {
   try {
     console.log('Started refreshing application (/) commands.')
 
-    // Clear all commands
+    // Set all commands
     await rest.put(Routes.applicationGuildCommands(BOT_ID, GUILD_ID), {
       body: [],
     })
 
     // Set all commands
-    await rest.put(Routes.applicationGuildCommands(BOT_ID, GUILD_ID), {
-      body: commands,
+    await rest.put(Routes.applicationCommands(BOT_ID), {
+      body: [],
     })
 
     console.log('Successfully reloaded application (/) commands.')

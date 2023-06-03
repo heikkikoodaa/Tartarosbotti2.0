@@ -26,6 +26,6 @@ mongoose
 
 module.exports = {
   startApp: () => {
-    app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`))
+    app.listen(PORT, () => console.log(`Tartarosbotti listening on port ${PORT}!`))
   },
 }

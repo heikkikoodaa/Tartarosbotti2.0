@@ -1,115 +1,70 @@
 const axios = require('axios')
 const { BACKEND_URL } = require('../configs/constants')
-
-const createUser = async (user) => {
-  const newUser = {
-    discordId: user.id,
-    username: user.username,
-    twitchUrl: user.twitchUrl,
-    avatar: user.avatar,
-  }
-
-  try {
-    const { data } = await axios.post(`${BACKEND_URL}/users`, newUser)
-
-    if (!data.success) {
-      return false
-    }
-
-    return true
-  } catch (error) {
-    console.error(error)
-    return false
-  }
-}
+const { checkUser } = require('../utils/userFunctions')
 
 const updateStreamStatus = async (user, isStreaming) => {
-  const updatedUser = {
+  const newStreamStatus = {
     isStreaming: isStreaming,
   }
 
   try {
-    const { data } = await axios.patch(
-      `${BACKEND_URL}/users/${user.discordId}`,
-      updatedUser,
-    )
-
-    if (!data.success) {
-      return false
-    }
-
-    return true
-  } catch (error) {
-    console.error(error)
-    return false
-  }
-}
-
-const checkUser = async (user) => {
-  // Check if user exists in database
-  try {
-    const { data } = await axios.get(`${BACKEND_URL}/users/${user.id}`)
-
-    if (!data.success) {
-      // If user does not exist, create new user
-      const newUserCreated = createUser(user)
-
-      if (!newUserCreated) return
-      console.log(`New user created: ${user.username}`)
-      return data.user
-    }
-
-    // If user exists, return their data
-    return data.user
+    await axios.patch(`${BACKEND_URL}/users/${user.discordId}`, newStreamStatus)
   } catch (error) {
     console.error(error)
   }
 }
 
-const handlePresence = (oldPresence, newPresence) => {
+const handlePresence = async (oldPresence, newPresence) => {
   // Ignore if presence update is not from a user
   if (newPresence.user.bot) return
-  const user = newPresence.user
+  const user = newPresence.user || oldPresence.user
 
   try {
     if (!newPresence.activities.length) return
 
     // Check if user starts streaming
     const isStreaming = newPresence.activities.some((activity) => {
-      if (activity.type === 'STREAMING') {
+      if (activity.type === 1) {
         user.twitchUrl = activity.url
-        return true
-      }
-    })
-
-    // Ignore if user is not streaming
-    if (!isStreaming) return
-
-    // Check if user exists in database and return their data
-    const fetchedUser = checkUser(user)
-
-    // Ignore if user is already streaming
-    if (fetchedUser.isStreaming) return
-
-    // Update user stream status
-    updateStreamStatus(fetchedUser, true)
-
-    // Check if user stops streaming
-    const streamEnding = oldPresence.activities.some((oldActivity) => {
-      const newPresenceIsNotStreaming = newPresence.activities.some(
-        (newActivity) => newActivity.type !== 'STREAMING',
-      )
-
-      // If user's old presence is streaming and new presence is not streaming, user is ending stream
-      if (oldActivity.type === 'STREAMING' && newPresenceIsNotStreaming) {
+        user.streamHeading = activity.details
+        user.streamGame = activity.state
+        console.log('user with details', user)
         return true
       }
       return false
     })
 
-    if (streamEnding) {
+    // Ignore if user is not starting a stream
+    if (!isStreaming) return
+
+    // Check if user exists in database and return their data
+    const fetchedUser = await checkUser(user)
+
+    // Check if fetchedUser is not streaming
+    if (fetchedUser.isStreaming === false) {
+      // Update user stream status
+      await updateStreamStatus(fetchedUser, true)
+      console.log(`${fetchedUser.username} started streaming!`)
+      return
+    }
+
+    // Check if user stops streaming
+    const isStreamEnding = oldPresence.activities.some((oldActivity) => {
+      const newPresenceIsNotStreaming = newPresence.activities.some(
+        (newActivity) => newActivity.type !== 1,
+      )
+
+      // If user's old presence was streaming and new presence is not streaming, user is ending the stream
+      if (oldActivity.type === 1 && newPresenceIsNotStreaming) {
+        return true
+      }
+      return false
+    })
+
+    if (isStreamEnding) {
       // Update user stream status
       updateStreamStatus(fetchedUser, false)
+      console.log(`${fetchedUser.username} stopped streaming!`)
     }
   } catch (error) {
     console.error(error)
