@@ -24,8 +24,7 @@ router.post('/', async (req, res) => {
   const { discordId, username, twitchUrl } = req.body
 
   if (!discordId || !username) {
-    res.send({ success: false, message: 'Missing required fields' })
-    return
+    return res.send({ success: false, message: 'Missing required fields' })
   }
 
   const newUser = new User({
@@ -38,20 +37,22 @@ router.post('/', async (req, res) => {
     await newUser.save()
     res.send({ success: true, message: 'User created' })
   } catch (error) {
-    res.send({ success: false, message: 'User could not be created' })
+    res.send({ success: false, message: 'User could not be created', errorMessage: error })
   }
 })
 
 router.patch('/:id', async (req, res) => {
-  const { isStreaming } = req.body
+  const { isStreaming: newStatus } = req.body
 
   try {
-    // Update user stream status
-    await User.findOneAndUpdate(
-      { discordId: req.params.id },
-      { isStreaming: isStreaming, $inc: { streamAmount: 1 } },
-    )
-    res.send({ success: true, message: 'Stream status updated' })
+    // Find user with their DiscordId
+    const user = await User.findOne({ discordId: req.params.id })
+
+    user.isStreaming = newStatus
+
+    await user.save()
+
+    res.send({ success: true, message: `Stream status updated to ${newStatus}` })
   } catch (error) {
     res.send({ success: false, message: 'Stream status could not be updated' })
   }

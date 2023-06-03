@@ -8,7 +8,13 @@ const updateStreamStatus = async (user, isStreaming) => {
   }
 
   try {
-    await axios.patch(`${BACKEND_URL}/users/${user.discordId}`, newStreamStatus)
+    const { data } = await axios.patch(`${BACKEND_URL}/users/${user.discordId}`, newStreamStatus)
+
+    if (!data.success) {
+      throw new Error(data.message)
+    }
+
+    console.log(`${user.username}: ${data.message}`)
   } catch (error) {
     console.error(error)
   }
@@ -28,7 +34,6 @@ const handlePresence = async (oldPresence, newPresence) => {
         user.twitchUrl = activity.url
         user.streamHeading = activity.details
         user.streamGame = activity.state
-        console.log('user with details', user)
         return true
       }
       return false
@@ -44,7 +49,10 @@ const handlePresence = async (oldPresence, newPresence) => {
     if (fetchedUser.isStreaming === false) {
       // Update user stream status
       await updateStreamStatus(fetchedUser, true)
-      console.log(`${fetchedUser.username} started streaming!`)
+      console.log(`${fetchedUser.username} started streaming! - Send a message to a channel!`)
+      /* SEND A MESSAGE TO A CHANNEL USING USER OBJECT
+      User object contains twitchUrl, streamHeading and streamGame
+      */
       return
     }
 
@@ -63,7 +71,7 @@ const handlePresence = async (oldPresence, newPresence) => {
 
     if (isStreamEnding) {
       // Update user stream status
-      updateStreamStatus(fetchedUser, false)
+      await updateStreamStatus(fetchedUser, false)
       console.log(`${fetchedUser.username} stopped streaming!`)
     }
   } catch (error) {

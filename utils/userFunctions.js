@@ -12,10 +12,10 @@ const createUser = async (user) => {
     const { data } = await axios.post(`${BACKEND_URL}/users`, newUser)
 
     if (!data.success) {
-      return false
+      throw new Error(data.errorMessage)
     }
 
-    return true
+    return data.user
   } catch (error) {
     console.error(error)
     return false
@@ -29,10 +29,13 @@ const checkUser = async (user) => {
 
     if (!data.success) {
       // If user does not exist, create new user
-      const newUserCreated = await createUser(user)
+      const createdUser = await createUser(user)
 
-      if (!newUserCreated) return
-      console.log(`New user created: ${user.username}`)
+      if (!createdUser) return
+      console.log(`New user created: ${createdUser.username}`)
+
+      // Return the newly created user
+      return createdUser
     }
 
     // If user exists, return their data
