@@ -72,10 +72,10 @@ const handlePresence = async (oldPresence, newPresence) => {
       return false
     })
 
-    let userWasStreaming = false
+    let wasStreaming = false
 
     if (oldPresence && oldPresence.activities !== null && Array.isArray(oldPresence.activities)) {
-      userWasStreaming = oldPresence.activities.some((activity) => {
+      wasStreaming = oldPresence.activities.some((activity) => {
         if (activity.type === 1) {
           user.twitchUrl = activity.url
           user.streamHeading = activity.details
@@ -87,7 +87,7 @@ const handlePresence = async (oldPresence, newPresence) => {
     }
 
     // Ignore if user is not starting a stream or was not streaming already
-    if (!userWasStreaming || !isStreaming) return
+    if (!wasStreaming || !isStreaming) return
 
     // Check if user exists in database and return their data
     const fetchedUser = await checkUser(user)
@@ -97,14 +97,12 @@ const handlePresence = async (oldPresence, newPresence) => {
       // Update user stream status
       await updateStreamStatus(fetchedUser, true)
       // console.log(`${fetchedUser.username} started streaming! - Send a message to a channel!`)
-      announceStream(user)
+      // announceStream(user)
       return
     }
 
-    const newPresenceNotStreaming = newPresence.activities.length === 0 || newPresence.activities.some((activity) => activity.type !== 1)
-
     // If user was streaming according to DB and the new presence is not streaming, the user is stopping the stream
-    if (newPresenceNotStreaming && fetchedUser.isStreaming) {
+    if (!isStreaming && fetchedUser.isStreaming) {
       await updateStreamStatus(fetchedUser, false)
     }
 
