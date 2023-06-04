@@ -1,4 +1,4 @@
-const { Client, Collection, GatewayIntentBits } = require('discord.js')
+const { Client, Collection, GatewayIntentBits, ActivityType } = require('discord.js')
 const path = require('node:path')
 const fs = require('node:fs')
 
@@ -14,6 +14,13 @@ const client = new Client({
 })
 
 client.commands = new Collection()
+
+const setBotActivity = () => {
+  client.user.setPresence({
+    activities: [{ name: 'laatustriimejä', type: ActivityType.Watching }],
+    status: 'online',
+  })
+}
 
 const foldersPath = path.join(__dirname, '..', 'commands')
 const commandFolders = fs.readdirSync(foldersPath)
@@ -36,4 +43,5 @@ for (const folder of commandFolders) {
 
 module.exports = {
   client,
+  setBotActivity,
 }

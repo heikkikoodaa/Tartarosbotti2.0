@@ -15,6 +15,7 @@ const createUser = async (user) => {
       throw new Error(data.errorMessage)
     }
 
+    console.log(`Created new user: ${data.user.username}`)
     return data.user
   } catch (error) {
     console.error(error)
@@ -30,9 +31,6 @@ const checkUser = async (user) => {
     if (!data.success) {
       // If user does not exist, create new user
       const createdUser = await createUser(user)
-
-      if (!createdUser) return
-      console.log(`New user created: ${createdUser.username}`)
 
       // Return the newly created user
       return createdUser

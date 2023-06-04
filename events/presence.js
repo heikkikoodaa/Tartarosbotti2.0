@@ -1,6 +1,7 @@
 const axios = require('axios')
-const { BACKEND_URL } = require('../configs/constants')
+const { BACKEND_URL, STREAM_NOTIFICATION_CHANNEL } = require('../configs/constants')
 const { checkUser } = require('../utils/userFunctions')
+const { client } = require('../configs/bot_config')
 
 const updateStreamStatus = async (user, isStreaming) => {
   const newStreamStatus = {
@@ -14,9 +15,43 @@ const updateStreamStatus = async (user, isStreaming) => {
       throw new Error(data.message)
     }
 
-    console.log(`${user.username}: ${data.message}`)
+    switch (isStreaming) {
+      case true:
+        console.log(`${user.username} started streaming!`)
+        break
+      case false:
+        console.log(`${user.username} stopped streaming!`)
+        break
+      default:
+        break
+    }
   } catch (error) {
     console.error(error)
+  }
+}
+
+const announceStream = (user) => {
+  const channel = client.channels.cache.get(STREAM_NOTIFICATION_CHANNEL)
+  const streamEmbed = {
+    title: user.streamHeading,
+    fields: [
+      {
+        name: 'Striimipeli',
+        value: user.streamGame,
+        inline: true,
+      },
+      {
+        name: 'Twitchin osoite',
+        value: user.twitchUrl,
+        inline: true,
+      },
+    ],
+  }
+
+  if (channel) {
+    channel.send({ embeds: [streamEmbed], content: `${user.username} aloitti striimin osoitteessa - ${user.twitchUrl}` })
+  } else {
+    console.error('Channel not found!')
   }
 }
 
@@ -26,8 +61,6 @@ const handlePresence = async (oldPresence, newPresence) => {
   const user = newPresence.user || oldPresence.user
 
   try {
-    if (!newPresence.activities.length) return
-
     // Check if user starts streaming
     const isStreaming = newPresence.activities.some((activity) => {
       if (activity.type === 1) {
@@ -39,43 +72,44 @@ const handlePresence = async (oldPresence, newPresence) => {
       return false
     })
 
-    // Ignore if user is not starting a stream
-    if (!isStreaming) return
+    let userWasStreaming = false
+
+    if (oldPresence && oldPresence.activities !== null && Array.isArray(oldPresence.activities)) {
+      userWasStreaming = oldPresence.activities.some((activity) => {
+        if (activity.type === 1) {
+          user.twitchUrl = activity.url
+          user.streamHeading = activity.details
+          user.streamGame = activity.state
+          return true
+        }
+        return false
+      })
+    }
+
+    // Ignore if user is not starting a stream or was not streaming already
+    if (!userWasStreaming || !isStreaming) return
 
     // Check if user exists in database and return their data
     const fetchedUser = await checkUser(user)
 
     // Check if fetchedUser is not streaming
-    if (fetchedUser.isStreaming === false) {
+    if (!fetchedUser.isStreaming) {
       // Update user stream status
       await updateStreamStatus(fetchedUser, true)
-      console.log(`${fetchedUser.username} started streaming! - Send a message to a channel!`)
-      /* SEND A MESSAGE TO A CHANNEL USING USER OBJECT
-      User object contains twitchUrl, streamHeading and streamGame
-      */
+      // console.log(`${fetchedUser.username} started streaming! - Send a message to a channel!`)
+      announceStream(user)
       return
     }
 
-    // Check if user stops streaming
-    const isStreamEnding = oldPresence.activities.some((oldActivity) => {
-      const newPresenceIsNotStreaming = newPresence.activities.some(
-        (newActivity) => newActivity.type !== 1,
-      )
+    const newPresenceNotStreaming = newPresence.activities.length === 0 || newPresence.activities.some((activity) => activity.type !== 1)
 
-      // If user's old presence was streaming and new presence is not streaming, user is ending the stream
-      if (oldActivity.type === 1 && newPresenceIsNotStreaming) {
-        return true
-      }
-      return false
-    })
-
-    if (isStreamEnding) {
-      // Update user stream status
+    // If user was streaming according to DB and the new presence is not streaming, the user is stopping the stream
+    if (newPresenceNotStreaming && fetchedUser.isStreaming) {
       await updateStreamStatus(fetchedUser, false)
-      console.log(`${fetchedUser.username} stopped streaming!`)
     }
+
   } catch (error) {
-    console.error(error)
+    console.error(error.message)
   }
 }
 

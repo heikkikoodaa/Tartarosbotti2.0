@@ -1,10 +1,11 @@
-const { client } = require('./configs/bot_config')
+const { client, setBotActivity } = require('./configs/bot_config')
 const { BOT_TOKEN } = require('./configs/constants')
 const { startApp } = require('./app/server')
 const handlePresence = require('./events/presence')
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`)
+  setBotActivity()
 
   // Start Express server
   startApp()
@@ -12,7 +13,7 @@ client.on('ready', () => {
 
 client.on('presenceUpdate', (oldPresence, newPresence) => {
   // Handle presence update
-  handlePresence(oldPresence, newPresence)
+  handlePresence(oldPresence, newPresence, client)
 })
 
 client.on('interactionCreate', async (interaction) => {

@@ -35,7 +35,7 @@ router.post('/', async (req, res) => {
 
   try {
     await newUser.save()
-    res.send({ success: true, message: 'User created' })
+    res.send({ success: true, message: 'User created', user: newUser })
   } catch (error) {
     res.send({ success: false, message: 'User could not be created', errorMessage: error })
   }
@@ -49,6 +49,10 @@ router.patch('/:id', async (req, res) => {
     const user = await User.findOne({ discordId: req.params.id })
 
     user.isStreaming = newStatus
+
+    if (newStatus) {
+      user.streamAmount += 1
+    }
 
     await user.save()
 
