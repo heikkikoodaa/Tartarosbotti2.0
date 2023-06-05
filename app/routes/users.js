@@ -50,6 +50,7 @@ router.patch('/:id', async (req, res) => {
 
     if (user.twitchUrl !== twitchUrl) {
       user.twitchUrl = twitchUrl
+      console.log(`${user.username}'s twitchUrl was set`)
     }
 
     user.isStreaming = newStatus

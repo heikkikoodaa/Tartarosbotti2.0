@@ -33,24 +33,9 @@ const updateStreamStatus = async (user, isStreaming) => {
 
 const announceStream = (user) => {
   const channel = client.channels.cache.get(STREAM_NOTIFICATION_CHANNEL)
-  const streamEmbed = {
-    title: user.streamHeading,
-    fields: [
-      {
-        name: 'Striimipeli',
-        value: user.streamGame,
-        inline: true,
-      },
-      {
-        name: 'Twitchin osoite',
-        value: user.twitchUrl,
-        inline: true,
-      },
-    ],
-  }
 
   if (channel) {
-    // channel.send({ embeds: [streamEmbed], content: `${user.username} aloitti striimin osoitteessa - ${user.twitchUrl}` })
+    channel.send(`${user.username} aloitti striimin osoitteessa - ${user.twitchUrl}`)
     console.log(`${user.username} aloitti striimin osoitteessa - ${user.twitchUrl}`)
   } else {
     console.error('Channel not found!')
