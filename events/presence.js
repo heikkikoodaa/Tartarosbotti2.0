@@ -6,6 +6,7 @@ const { client } = require('../configs/bot_config')
 const updateStreamStatus = async (user, isStreaming) => {
   const newStreamStatus = {
     isStreaming: isStreaming,
+    twitchUrl: user.twitchUrl,
   }
 
   try {
@@ -49,7 +50,8 @@ const announceStream = (user) => {
   }
 
   if (channel) {
-    channel.send({ embeds: [streamEmbed], content: `${user.username} aloitti striimin osoitteessa - ${user.twitchUrl}` })
+    // channel.send({ embeds: [streamEmbed], content: `${user.username} aloitti striimin osoitteessa - ${user.twitchUrl}` })
+    console.log(`${user.username} aloitti striimin osoitteessa - ${user.twitchUrl}`)
   } else {
     console.error('Channel not found!')
   }
@@ -69,40 +71,21 @@ const handlePresence = async (oldPresence, newPresence) => {
         user.streamGame = activity.state
         return true
       }
-      return false
     })
 
-    let wasStreaming = false
-
-    if (oldPresence && oldPresence.activities !== null && Array.isArray(oldPresence.activities)) {
-      wasStreaming = oldPresence.activities.some((activity) => {
-        if (activity.type === 1) {
-          user.twitchUrl = activity.url
-          user.streamHeading = activity.details
-          user.streamGame = activity.state
-          return true
-        }
-        return false
-      })
-    }
-
-    // Ignore if user is not starting a stream or was not streaming already
-    if (!wasStreaming || !isStreaming) return
-
-    // Check if user exists in database and return their data
     const fetchedUser = await checkUser(user)
 
     // Check if fetchedUser is not streaming
-    if (!fetchedUser.isStreaming) {
+    if (!fetchedUser.isStreaming && isStreaming) {
       // Update user stream status
       await updateStreamStatus(fetchedUser, true)
       // console.log(`${fetchedUser.username} started streaming! - Send a message to a channel!`)
-      // announceStream(user)
+      announceStream(user)
       return
     }
 
     // If user was streaming according to DB and the new presence is not streaming, the user is stopping the stream
-    if (!isStreaming && fetchedUser.isStreaming) {
+    if (fetchedUser.isStreaming && !isStreaming) {
       await updateStreamStatus(fetchedUser, false)
     }
 
