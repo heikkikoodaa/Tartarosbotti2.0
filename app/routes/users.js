@@ -42,11 +42,15 @@ router.post('/', async (req, res) => {
 })
 
 router.patch('/:id', async (req, res) => {
-  const { isStreaming: newStatus } = req.body
+  const { isStreaming: newStatus, twitchUrl } = req.body
 
   try {
     // Find user with their DiscordId
     const user = await User.findOne({ discordId: req.params.id })
+
+    if (user.twitchUrl !== twitchUrl) {
+      user.twitchUrl = twitchUrl
+    }
 
     user.isStreaming = newStatus
 
