@@ -36,7 +36,7 @@ const announceStream = (user) => {
   const channel = client.channels.cache.get(STREAM_NOTIFICATION_CHANNEL)
 
   if (channel) {
-    channel.send(`${user.username} aloitti striimin osoitteessa - ${user.twitchUrl}`)
+    channel.send(`${user.username} aloitti striimin osoitteessa - ${user.twitchUrl}\n${user.streamHeading}`)
     console.log(`${user.username} aloitti striimin osoitteessa - ${user.twitchUrl}`)
   } else {
     console.error('Channel not found!')
