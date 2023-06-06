@@ -1,4 +1,5 @@
 const axios = require('axios')
+const TartarosError = require('../classes/TartarosError')
 const { BACKEND_URL, STREAM_NOTIFICATION_CHANNEL } = require('../configs/constants')
 const { checkUser } = require('../utils/userFunctions')
 const { client } = require('../configs/bot_config')
@@ -13,7 +14,7 @@ const updateStreamStatus = async (user, isStreaming) => {
     const { data } = await axios.patch(`${BACKEND_URL}/users/${user.discordId}`, newStreamStatus)
 
     if (!data.success) {
-      throw new Error(data.message)
+      throw new TartarosError(data.message, 'Fetching user information')
     }
 
     switch (isStreaming) {

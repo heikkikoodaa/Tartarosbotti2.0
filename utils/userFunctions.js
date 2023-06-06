@@ -1,5 +1,7 @@
 const axios = require('axios')
 const { BACKEND_URL } = require('../configs/constants')
+const TartarosError = require('../classes/TartarosError')
+const errorHandler = require('../utils/errorHandler')
 
 const createUser = async (user) => {
   const newUser = {
@@ -12,13 +14,13 @@ const createUser = async (user) => {
     const { data } = await axios.post(`${BACKEND_URL}/users`, newUser)
 
     if (!data.success) {
-      throw new Error(data.errorMessage)
+      throw new TartarosError(data.errorMessage, 'Creating a new user')
     }
 
     console.log(`Created new user: ${data.user.username}`)
     return data.user
   } catch (error) {
-    console.error(error)
+    errorHandler(error)
     return false
   }
 }

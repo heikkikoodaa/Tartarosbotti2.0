@@ -4,6 +4,8 @@ require('dotenv').config()
 const BOT_TOKEN = process.env.BOT_TOKEN
 const BOT_ID = process.env.BOT_ID
 const GUILD_ID = process.env.GUILD_ID
+
+// Guild specific constants and variables
 const STREAM_NOTIFICATION_CHANNEL = process.env.STREAM_NOTIFICATION_CHANNEL
 
 // Get the MongoDB URL from the .env file
