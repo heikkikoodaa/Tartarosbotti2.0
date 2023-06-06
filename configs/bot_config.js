@@ -15,11 +15,18 @@ const client = new Client({
 
 client.commands = new Collection()
 
-const setBotActivity = () => {
+const setBotActivity = async () => {
   client.user.setPresence({
     activities: [{ name: 'laatustriimejä', type: ActivityType.Watching }],
     status: 'online',
   })
+
+  // try {
+  //   await client.user.set('Tartarosbotti 🔔')
+  //   console.log('Bot username changed!')
+  // } catch (error) {
+  //   console.error(error.message)
+  // }
 }
 
 const foldersPath = path.join(__dirname, '..', 'commands')
