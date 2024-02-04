@@ -4,7 +4,7 @@
   "description": "Discord community bot to handle automatic stream announcements",
   "main": "main.js",
   "scripts": {
-    "start": "nodemon main.js"
+    "start": "pm2 start main.js --name 'Tartarosbotti'"
   },
   "author": "Heikki R",
   "license": "ISC",
@@ -20,6 +20,7 @@
     "discord.js": "^14.11.0",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "helmet": "^7.0.0",
     "mongoose": "^7.1.1"
   }
 }

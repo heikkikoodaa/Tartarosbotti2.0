@@ -4,6 +4,7 @@ const { MONGO_URL } = require('../configs/constants')
 const users = require('./routes/users')
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const helmet = require('helmet')
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -12,6 +13,7 @@ const PORT = process.env.PORT || 3000
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cors())
+app.use(helmet())
 
 // Routes
 app.use('/users', users)
