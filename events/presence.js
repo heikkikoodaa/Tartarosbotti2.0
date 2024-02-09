@@ -37,7 +37,7 @@ const announceStream = (user) => {
   const channel = client.channels.cache.get(STREAM_NOTIFICATION_CHANNEL)
 
   if (channel) {
-    channel.send(`${user.username} aloitti striimin osoitteessa - ${user.twitchUrl}\n${user.streamHeading}`)
+    channel.send(`${user.username} aloitti striimin osoitteessa - ${user.twitchUrl}\n${user.streamHeading || ''}`)
     console.log(`${user.username} aloitti striimin osoitteessa`)
   } else {
     console.error('Channel not found!')
@@ -68,7 +68,11 @@ const handlePresence = async (oldPresence, newPresence) => {
     if (!fetchedUser.isStreaming && isStreaming) {
       // Update user stream status
       await updateStreamStatus(fetchedUser, true)
-      announceStream(user)
+
+      if (fetchedUser.twitchUrl) {
+        announceStream(fetchedUser)
+      }
+
       return
     }
 

@@ -1,4 +1,4 @@
-const { Client, Collection, GatewayIntentBits, ActivityType } = require('discord.js')
+const { Client, Collection, GatewayIntentBits, ActivityType, Partials } = require('discord.js')
 const path = require('node:path')
 const fs = require('node:fs')
 
@@ -10,6 +10,10 @@ const client = new Client({
     GatewayIntentBits.GuildPresences,
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMembers,
+  ],
+  partials: [
+    Partials.Channel,
+    Partials.Message,
   ],
 })
 
