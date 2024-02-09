@@ -3,6 +3,7 @@ const TartarosError = require('../classes/TartarosError')
 const { BACKEND_URL, STREAM_NOTIFICATION_CHANNEL } = require('../configs/constants')
 const { checkUser } = require('../utils/userFunctions')
 const { client } = require('../configs/bot_config')
+const { ActivityType } = require('discord.js')
 
 const updateStreamStatus = async (user, isStreaming) => {
   const newStreamStatus = {
@@ -14,7 +15,7 @@ const updateStreamStatus = async (user, isStreaming) => {
     const { data } = await axios.patch(`${BACKEND_URL}/users/${user.discordId}`, newStreamStatus)
 
     if (!data.success) {
-      throw new TartarosError(data.message, 'Fetching user information')
+      throw new TartarosError(data.message, 'Patching user information')
     }
 
     switch (isStreaming) {
@@ -37,7 +38,7 @@ const announceStream = (user) => {
 
   if (channel) {
     channel.send(`${user.username} aloitti striimin osoitteessa - ${user.twitchUrl}\n${user.streamHeading}`)
-    console.log(`${user.username} aloitti striimin osoitteessa - ${user.twitchUrl}`)
+    console.log(`${user.username} aloitti striimin osoitteessa`)
   } else {
     console.error('Channel not found!')
   }
@@ -46,26 +47,27 @@ const announceStream = (user) => {
 const handlePresence = async (oldPresence, newPresence) => {
   // Ignore if presence update is not from a user
   if (newPresence.user.bot) return
-  const user = newPresence.user || oldPresence.user
+
+  const user = newPresence.user
+  const fetchedUser = await checkUser(user)
+
+  let isStreaming = false
 
   try {
-    // Check if user starts streaming
-    const isStreaming = newPresence.activities.some((activity) => {
-      if (activity.type === 1) {
-        user.twitchUrl = activity.url
-        user.streamHeading = activity.details
-        user.streamGame = activity.state
-        return true
+    for (const activity of newPresence.activities) {
+      if (activity.type === ActivityType.Streaming) {
+        fetchedUser.twitchUrl = activity.url
+        fetchedUser.streamHeading = activity.details
+        fetchedUser.streamGame = activity.state
+        isStreaming = true
+        break
       }
-    })
+    }
 
-    const fetchedUser = await checkUser(user)
-
-    // Check if fetchedUser is not streaming
+    // Check if fetchedUser is not streaming already
     if (!fetchedUser.isStreaming && isStreaming) {
       // Update user stream status
       await updateStreamStatus(fetchedUser, true)
-      // console.log(`${fetchedUser.username} started streaming! - Send a message to a channel!`)
       announceStream(user)
       return
     }

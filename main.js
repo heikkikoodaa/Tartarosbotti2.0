@@ -13,7 +13,7 @@ client.on('ready', () => {
 
 client.on('presenceUpdate', (oldPresence, newPresence) => {
   // Handle presence update
-  handlePresence(oldPresence, newPresence, client)
+  handlePresence(oldPresence, newPresence)
 })
 
 client.on('interactionCreate', async (interaction) => {
@@ -45,11 +45,6 @@ client.on('interactionCreate', async (interaction) => {
     }
   }
 })
-
-// client.on('messageCreate', async (msg) => {
-//   // Ignore if message is from bot
-//   if (msg.author.bot) return
-// })
 
 // Login to Discord
 client.login(BOT_TOKEN)

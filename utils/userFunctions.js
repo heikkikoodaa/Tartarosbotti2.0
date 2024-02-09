@@ -41,7 +41,8 @@ const checkUser = async (user) => {
     // If user exists, return their data
     return data.user
   } catch (error) {
-    console.error(error)
+    const errorMessage = error?.message || error
+    console.error(errorMessage)
   }
 }
 
