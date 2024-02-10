@@ -53,7 +53,8 @@ const handlePresence = async (oldPresence, newPresence) => {
   const user = newPresence.user
   const fetchedUser = await checkUser(user)
 
-  let isStreaming = false
+  let isStreamStarting = false
+  let wasAlreadyStreaming = false
 
   try {
     for (const activity of newPresence.activities) {
@@ -61,13 +62,20 @@ const handlePresence = async (oldPresence, newPresence) => {
         fetchedUser.twitchUrl = activity.url
         fetchedUser.streamHeading = activity.details
         fetchedUser.streamGame = activity.state
-        isStreaming = true
+        isStreamStarting = true
         break
       }
     }
 
-    // Check if fetchedUser is not streaming already
-    if (!fetchedUser.isStreaming && isStreaming) {
+    for (const activity of oldPresence.activities) {
+      if (activity.type === ActivityType.Streaming) {
+        wasAlreadyStreaming = true
+      }
+      break
+    }
+
+    // Check if user is starting a stream, but ignore if isStreaming is false
+    if (!fetchedUser.isStreaming && isStreamStarting && !wasAlreadyStreaming) {
       // Update user stream status
       await updateStreamStatus(fetchedUser, true)
 
@@ -79,12 +87,12 @@ const handlePresence = async (oldPresence, newPresence) => {
     }
 
     // If user was streaming according to DB and the new presence is not streaming, the user is stopping the stream
-    if (fetchedUser.isStreaming && !isStreaming) {
+    if (fetchedUser.isStreaming && !isStreamStarting) {
       await updateStreamStatus(fetchedUser, false)
     }
 
   } catch (error) {
-    console.error(error.message)
+    console.error(error.message || error)
   }
 }
 

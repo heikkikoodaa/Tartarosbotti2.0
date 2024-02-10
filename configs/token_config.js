@@ -26,6 +26,22 @@ const getAuthToken = async () => {
   }
 }
 
+const getTokenFromDB = async () => {
+  try {
+    const { data } = await axios.get(`${BACKEND_URL}/token`)
+
+    if (!data.success) {
+      throw Error('Fetching token from DB failed')
+    }
+
+    const encryptedToken = data.token
+
+    return encryptedToken
+  } catch (error) {
+    console.error(`[ERROR]: ${error.message || error}`)
+  }
+}
+
 const saveTokenToDB = async (tokenData) => {
   const { token, expiresAt } = tokenData
   const encryptedToken = encrypt(token)
@@ -63,4 +79,5 @@ const requestAndSaveToken = async () => {
 
 module.exports = {
   requestAndSaveToken,
+  getTokenFromDB,
 }
