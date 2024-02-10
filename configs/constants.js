@@ -8,6 +8,10 @@ const BOT_TOKEN = isProductionEnvironment ? process.env.BOT_TOKEN_PROD : process
 const BOT_ID = isProductionEnvironment ? process.env.BOT_ID_PROD : process.env.BOT_ID_DEV
 const GUILD_ID = isProductionEnvironment ? process.env.GUILD_ID_PROD : process.env.GUILD_ID_DEV
 
+// Encryption pass and salt
+const ENCRYPT_PASS = process.env.ENCRYPT_PASS
+const ENCRYPT_SALT = process.env.SALT
+
 // Guild specific constants and variables
 const STREAM_NOTIFICATION_CHANNEL = isProductionEnvironment ?
   process.env.STREAM_NOTIFICATION_CHANNEL_PROD : process.env.STREAM_NOTIFICATION_CHANNEL_DEV
@@ -18,12 +22,20 @@ const MONGO_URL = isProductionEnvironment ? process.env.MONGO_URL_PROD : process
 // Get the backend URL from the .env file
 const BACKEND_URL = process.env.BACKEND_URL
 
+// Get Twitch client ID and client secret
+const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID
+const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET
+
 // Export the bot token
 module.exports = {
   BACKEND_URL,
   BOT_ID,
   BOT_TOKEN,
   GUILD_ID,
+  ENCRYPT_SALT,
+  ENCRYPT_PASS,
   MONGO_URL,
   STREAM_NOTIFICATION_CHANNEL,
+  TWITCH_CLIENT_ID,
+  TWITCH_CLIENT_SECRET,
 }

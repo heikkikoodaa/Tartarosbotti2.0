@@ -2,6 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const { MONGO_URL } = require('../configs/constants')
 const users = require('./routes/users')
+const token = require('./routes/token')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const helmet = require('helmet')
@@ -17,6 +18,7 @@ app.use(helmet())
 
 // Routes
 app.use('/users', users)
+app.use('/token', token)
 
 mongoose
   .connect(MONGO_URL, {
