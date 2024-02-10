@@ -1,6 +1,7 @@
 const { Client, Collection, GatewayIntentBits, ActivityType, Partials } = require('discord.js')
 const path = require('node:path')
 const fs = require('node:fs')
+const { isProductionEnvironment, GUILD_ID } = require('./constants')
 
 const client = new Client({
   intents: [
@@ -19,18 +20,28 @@ const client = new Client({
 
 client.commands = new Collection()
 
-const setBotActivity = async () => {
+const setBotActivity = async (areNotificationsEnabled) => {
   client.user.setPresence({
     activities: [{ name: 'laatustriimejä', type: ActivityType.Watching }],
     status: 'online',
   })
 
-  // try {
-  //   await client.user.set('Tartarosbotti 🔔')
-  //   console.log('Bot username changed!')
-  // } catch (error) {
-  //   console.error(error.message)
-  // }
+  const botName = isProductionEnvironment ? 'Tartarosbotti' : 'Testibotti'
+  const notificationIcon = areNotificationsEnabled ? '🔔' : '🔕'
+  const guild = client.guilds.cache.get(GUILD_ID)
+
+  try {
+    if (guild) {
+      const botMember = await guild.members.fetch(client.user.id)
+      botMember.setNickname(`${botName} ${notificationIcon}`)
+
+      console.log('Nickname successfully updated')
+    } else {
+      console.error('Guild not found')
+    }
+  } catch (error) {
+    console.error(error.message)
+  }
 }
 
 const foldersPath = path.join(__dirname, '..', 'commands')

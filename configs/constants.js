@@ -1,5 +1,3 @@
-require('dotenv').config()
-
 const ENVIRONMENT = process.env.ENVIRONMENT.toLowerCase()
 const isProductionEnvironment = ENVIRONMENT === 'production' ? true : false
 
@@ -38,4 +36,5 @@ module.exports = {
   STREAM_NOTIFICATION_CHANNEL,
   TWITCH_CLIENT_ID,
   TWITCH_CLIENT_SECRET,
+  isProductionEnvironment,
 }

@@ -1,11 +1,17 @@
+require('dotenv').config()
+
 const { client, setBotActivity } = require('./configs/bot_config')
 const { BOT_TOKEN } = require('./configs/constants')
 const { startApp } = require('./app/server')
 const handlePresence = require('./events/presence')
 
+
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`)
-  setBotActivity()
+
+  const areNotificationsEnabled = process.env.NOTIFICATIONS_ENABLED === 'true'
+
+  setBotActivity(areNotificationsEnabled)
 
   // Start Express server
   startApp()

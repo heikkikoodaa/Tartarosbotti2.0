@@ -5,6 +5,8 @@ const { checkUser } = require('../utils/userFunctions')
 const { client } = require('../configs/bot_config')
 const { ActivityType } = require('discord.js')
 
+const areNotificationsEnabled = process.env.NOTIFICATIONS_ENABLED === 'true'
+
 const updateStreamStatus = async (user, isStreaming) => {
   const newStreamStatus = {
     isStreaming: isStreaming,
@@ -69,7 +71,7 @@ const handlePresence = async (oldPresence, newPresence) => {
       // Update user stream status
       await updateStreamStatus(fetchedUser, true)
 
-      if (fetchedUser.twitchUrl) {
+      if (fetchedUser.twitchUrl && areNotificationsEnabled) {
         announceStream(fetchedUser)
       }
 
