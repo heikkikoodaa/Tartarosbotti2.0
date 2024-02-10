@@ -40,7 +40,7 @@ const announceStream = (user) => {
 
   if (channel) {
     channel.send(`${user.username} aloitti striimin osoitteessa - ${user.twitchUrl}\n${user.streamHeading || ''}`)
-    console.log(`${user.username} aloitti striimin osoitteessa`)
+    console.log(`${user.username} aloitti striimin`)
   } else {
     console.error('Channel not found!')
   }
