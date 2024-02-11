@@ -2,8 +2,9 @@ const mongoose = require('mongoose')
 const { Schema } = mongoose
 
 const tokenSchema = new Schema({
+  name: { type: String, unique: true, required: true },
+  token: { type: String, required: true },
   iv: String,
-  encryptedToken: String,
   expiresAt: Date,
 })
 
