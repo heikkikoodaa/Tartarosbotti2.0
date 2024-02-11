@@ -26,15 +26,36 @@ const getAuthToken = async () => {
   }
 }
 
+const isTokenExpired = (tokenExpiresAt) => {
+  const today = new Date()
+  const expirationDate = new Date(tokenExpiresAt)
+
+  return today > expirationDate
+}
+
 const getTokenFromDB = async () => {
   try {
     const { data } = await axios.get(`${BACKEND_URL}/token`)
 
-    if (!data.success) {
-      throw Error('Fetching token from DB failed')
+    if (!data.token || !data.success) {
+      console.log('No token in the DB. Trying to fetch a new one in 5 sec...')
+      setTimeout(async () => {
+        console.log('Contacting the server to request a new token')
+        await requestAndSaveToken()
+        getTokenFromDB()
+      }, 5000)
     }
 
     const encryptedToken = data.token
+
+    if (isTokenExpired(encryptedToken.expiresAt)) {
+      console.log('Token is expired! Fetching a new one in 5 sec...')
+      setTimeout(async () => {
+        console.log('Contacting the server to request a new token')
+        await requestAndSaveToken()
+        getTokenFromDB()
+      }, 5000)
+    }
 
     return encryptedToken
   } catch (error) {
