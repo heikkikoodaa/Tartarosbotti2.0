@@ -17,8 +17,8 @@ const encrypt = (token) => {
 
 const decrypt = (encryptedToken) => {
   const decryptIv = Buffer.from(encryptedToken.iv, 'hex')
-  const encryptedText = Buffer.from(encryptedToken.encryptedToken, 'hex')
-  const decipher = crypto.createDecipheriv('aes-256-cbc', key, decryptIv)
+  const encryptedText = Buffer.from(encryptedToken.token, 'hex')
+  const decipher = crypto.createDecipheriv(algorithm, key, decryptIv)
   let decrypted = decipher.update(encryptedText, 'hex', 'utf8')
   decrypted += decipher.final('utf8')
 
