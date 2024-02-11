@@ -10,15 +10,15 @@ router.post('/', async (req, res) => {
     return res.send({ success: false, message: 'Missing required token fields' })
   }
 
-  const newToken = new Token({
-    iv,
-    encryptedToken,
-    expiresAt,
-  })
+  const name = 'botToken'
 
   try {
-    await newToken.save()
-    res.send({ success: true, message: 'Token saved', token: newToken })
+    const token = await Token.findOneAndUpdate(
+      { name },
+      { $set: { name, iv, token: encryptedToken, expiresAt } },
+      { upsert: true, new: true },
+    )
+    res.send({ success: true, message: 'Token saved', token: token })
   } catch (error) {
     res.send({ success: false, message: 'Token could not be saved', errorMessage: error.message || error })
   }
@@ -26,13 +26,13 @@ router.post('/', async (req, res) => {
 
 router.get('/', async (req, res) => {
   try {
-    const token = await Token.find({}).lean()
+    const token = await Token.findOne({ name: 'botToken' }).lean()
 
-    if (!token || !token.length) {
+    if (!token) {
       return res.send({ success: false, message: 'No token found in the DB' })
     }
 
-    res.send({ success: true, token: token[0] })
+    res.send({ success: true, token: token })
   } catch (error) {
     res.send({ success: false, message: 'An error occured when fetching the token', errorMessage: error.message || error })
   }
