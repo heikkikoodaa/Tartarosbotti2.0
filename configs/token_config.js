@@ -2,6 +2,8 @@ const axios = require('axios')
 const { TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, BACKEND_URL } = require('./constants')
 const { encrypt, decrypt } = require('./encryption')
 
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+
 const getAuthToken = async () => {
   const clientId = TWITCH_CLIENT_ID
   const clientSecret = TWITCH_CLIENT_SECRET
@@ -36,28 +38,23 @@ const isTokenExpired = (tokenExpiresAt) => {
 const getTokenFromDB = async () => {
   try {
     const { data } = await axios.get(`${BACKEND_URL}/token`)
+    let fetchedToken = data.token
 
-    if (!data.token || !data.success) {
+    if (!fetchedToken || !data.success) {
       console.log('No token in the DB. Trying to fetch a new one in 5 sec...')
-      setTimeout(async () => {
-        console.log('Contacting the server to request a new token')
-        await requestAndSaveToken()
-        await getTokenFromDB()
-      }, 5000)
+      await delay(5000)
+      console.log('Contacting the server to request a new token')
+      fetchedToken = await requestAndSaveToken()
     }
 
-    const encryptedToken = data.token
-
-    if (isTokenExpired(encryptedToken.expiresAt)) {
+    if (isTokenExpired(fetchedToken.expiresAt)) {
       console.log('Token is expired! Fetching a new one in 5 sec...')
-      setTimeout(async () => {
-        console.log('Contacting the server to request a new token')
-        await requestAndSaveToken()
-        await getTokenFromDB()
-      }, 5000)
+      await delay(5000)
+      console.log('Contacting the server to request a new token')
+      fetchedToken = await requestAndSaveToken()
     }
 
-    const { token } = decrypt(encryptedToken)
+    const { token } = decrypt(fetchedToken)
 
     return token
   } catch (error) {
@@ -82,7 +79,7 @@ const saveTokenToDB = async (tokenData) => {
       throw new Error(data.errorMessage)
     }
 
-    console.log('Token saved successfully')
+    return data.token
   } catch (error) {
     const errorMessage = error?.message || error
     console.error(`[ERROR]: ${errorMessage}`)
@@ -93,10 +90,13 @@ const requestAndSaveToken = async () => {
   const tokenData = await getAuthToken()
 
   if (tokenData) {
-    await saveTokenToDB(tokenData)
     console.log('Token fetched and saved to the vault')
+
+    const savedToken = await saveTokenToDB(tokenData)
+    return savedToken
   } else {
     console.error('Failed to request token')
+    return null
   }
 }
 
