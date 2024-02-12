@@ -66,7 +66,9 @@ const getGameInfo = async (game) => {
 
       if (gameData.cover.url) {
         const originalUrl = gameData.cover.url
-        let newUrl = originalUrl.startsWith('//') ? 'https:' + originalUrl : originalUrl
+        let newUrl = originalUrl.startsWith('//')
+          ? 'https:' + originalUrl
+          : originalUrl
         newUrl = newUrl.replace('t_thumb', 't_cover_big')
 
         gameData.cover.url = newUrl
@@ -90,18 +92,21 @@ const announceStream = async (user) => {
   if (channel) {
     const streamEmbed = new EmbedBuilder()
       .setColor('#825791')
-      .setTitle(user.streamHeading || `Käyttäjän ${user.username} striimi alkaa`)
+      .setTitle(
+        user.streamHeading || `Käyttäjän ${user.username} striimi alkaa`,
+      )
       .setURL(user.twitchUrl)
       .setAuthor({
         name: user.username,
         iconURL: user.avatar,
       })
-      .addFields(
-          { name: 'Peli', value: user.streamGame || 'Tuntematon peli' },
-      )
-      .setImage(gameData.cover.url)
+      .addFields({ name: 'Peli', value: user.streamGame || 'Tuntematon peli' })
+      .setImage(gameData.cover.url || null)
 
-    channel.send({ embeds: [streamEmbed] })
+    channel.send({
+      content: `Mitäs tämä on? ${user.username} aloitti striimin!`,
+      embeds: [streamEmbed],
+    })
   } else {
     console.error('Striimi-ilmoituskanavaa ei löytynyt!')
   }
