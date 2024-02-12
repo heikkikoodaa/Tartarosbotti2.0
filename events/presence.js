@@ -127,23 +127,29 @@ const handlePresence = async (oldPresence, newPresence) => {
 
   let isStreamStarting = false
   let wasAlreadyStreaming = false
+  const isNewActivities = newPresence?.activities.length > 0
+  const isOldActivities = oldPresence?.activities.length > 0
 
   try {
-    for (const activity of newPresence.activities) {
-      if (activity.type === ActivityType.Streaming) {
-        fetchedUser.twitchUrl = activity.url
-        fetchedUser.streamHeading = activity.details
-        fetchedUser.streamGame = activity.state
-        isStreamStarting = true
-        break
+    if (isNewActivities) {
+      for (const activity of newPresence.activities) {
+        if (activity.type === ActivityType.Streaming) {
+          fetchedUser.twitchUrl = activity.url
+          fetchedUser.streamHeading = activity.details
+          fetchedUser.streamGame = activity.state
+          isStreamStarting = true
+          break
+        }
       }
     }
 
-    for (const activity of oldPresence.activities) {
-      if (activity.type === ActivityType.Streaming) {
-        wasAlreadyStreaming = true
+    if (isOldActivities) {
+      for (const activity of oldPresence.activities) {
+        if (activity.type === ActivityType.Streaming) {
+          wasAlreadyStreaming = true
+        }
+        break
       }
-      break
     }
 
     // Check if user is starting a stream, but ignore if isStreaming is false
