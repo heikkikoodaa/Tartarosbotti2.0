@@ -1,6 +1,6 @@
 const axios = require('axios')
 const { TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, BACKEND_URL } = require('./constants')
-const { encrypt } = require('./encryption')
+const { encrypt, decrypt } = require('./encryption')
 
 const getAuthToken = async () => {
   const clientId = TWITCH_CLIENT_ID
@@ -42,7 +42,7 @@ const getTokenFromDB = async () => {
       setTimeout(async () => {
         console.log('Contacting the server to request a new token')
         await requestAndSaveToken()
-        getTokenFromDB()
+        await getTokenFromDB()
       }, 5000)
     }
 
@@ -53,11 +53,13 @@ const getTokenFromDB = async () => {
       setTimeout(async () => {
         console.log('Contacting the server to request a new token')
         await requestAndSaveToken()
-        getTokenFromDB()
+        await getTokenFromDB()
       }, 5000)
     }
 
-    return encryptedToken
+    const { token } = decrypt(encryptedToken)
+
+    return token
   } catch (error) {
     console.error(`[ERROR]: ${error.message || error}`)
   }
