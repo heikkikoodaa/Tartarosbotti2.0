@@ -1,7 +1,6 @@
-const axios = require('axios')
-const { BACKEND_URL } = require('../configs/constants')
 const TartarosError = require('../classes/TartarosError')
 const errorHandler = require('../utils/errorHandler')
+const apiClient = require('../configs/bot_token_config')
 
 const createUser = async (user) => {
   const newUser = {
@@ -11,7 +10,7 @@ const createUser = async (user) => {
   }
 
   try {
-    const { data } = await axios.post(`${BACKEND_URL}/users`, newUser)
+    const { data } = await apiClient.post('/users', newUser)
 
     if (!data.success) {
       throw new TartarosError(data.errorMessage, 'Creating a new user')
@@ -28,7 +27,7 @@ const createUser = async (user) => {
 const checkUser = async (user) => {
   // Check if user exists in database
   try {
-    const { data } = await axios.get(`${BACKEND_URL}/users/${user.id}`)
+    const { data } = await apiClient.get(`/users/${user.id}`)
 
     if (!data.success) {
       // If user does not exist, create new user

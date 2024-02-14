@@ -1,7 +1,6 @@
 const axios = require('axios')
 const TartarosError = require('../classes/TartarosError')
 const {
-  BACKEND_URL,
   STREAM_NOTIFICATION_CHANNEL,
   TWITCH_CLIENT_ID,
 } = require('../configs/constants')
@@ -10,6 +9,7 @@ const { client } = require('../configs/bot_config')
 // eslint-disable-next-line no-unused-vars
 const { ActivityType, EmbedBuilder, User } = require('discord.js')
 const { getTokenFromDB } = require('../configs/token_config')
+const apiClient = require('../configs/bot_token_config')
 
 const areNotificationsEnabled = process.env.NOTIFICATIONS_ENABLED === 'true'
 
@@ -20,8 +20,8 @@ const updateStreamStatus = async (user, isStreaming) => {
   }
 
   try {
-    const { data } = await axios.patch(
-      `${BACKEND_URL}/users/${user.discordId}`,
+    const { data } = await apiClient.patch(
+      `/users/${user.discordId}`,
       newStreamStatus,
     )
 
@@ -116,6 +116,9 @@ const handlePresence = async (oldPresence, newPresence) => {
   // Ignore if presence update is not from a user
   if (newPresence.user.bot) return
 
+  const isNewActivities = newPresence?.activities.length > 0
+  const isOldActivities = oldPresence?.activities.length > 0
+
   /**
    * @type {User}
    */
@@ -127,8 +130,6 @@ const handlePresence = async (oldPresence, newPresence) => {
 
   let isStreamStarting = false
   let wasAlreadyStreaming = false
-  const isNewActivities = newPresence?.activities.length > 0
-  const isOldActivities = oldPresence?.activities.length > 0
 
   try {
     if (isNewActivities) {

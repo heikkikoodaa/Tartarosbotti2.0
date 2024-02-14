@@ -1,6 +1,7 @@
 const axios = require('axios')
-const { TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, BACKEND_URL } = require('./constants')
+const { TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET } = require('./constants')
 const { encrypt, decrypt } = require('./encryption')
+const apiClient = require('./bot_token_config')
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -37,7 +38,7 @@ const isTokenExpired = (tokenExpiresAt) => {
 
 const getTokenFromDB = async () => {
   try {
-    const { data } = await axios.get(`${BACKEND_URL}/token`)
+    const { data } = await apiClient.get('/token')
     let fetchedToken = data.token
 
     if (!fetchedToken || !data.success) {
@@ -73,7 +74,7 @@ const saveTokenToDB = async (tokenData) => {
       expiresAt,
     }
 
-    const { data } = await axios.post(`${BACKEND_URL}/token`, newToken)
+    const { data } = await apiClient.post('/token', newToken)
 
     if (!data.success) {
       throw new Error(data.errorMessage)

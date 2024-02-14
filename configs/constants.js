@@ -24,6 +24,8 @@ const BACKEND_URL = process.env.BACKEND_URL
 const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID
 const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET
 
+const TOKEN_SECRET = process.env.TOKEN_SECRET
+
 // Export the bot token
 module.exports = {
   BACKEND_URL,
@@ -34,6 +36,7 @@ module.exports = {
   ENCRYPT_PASS,
   MONGO_URL,
   STREAM_NOTIFICATION_CHANNEL,
+  TOKEN_SECRET,
   TWITCH_CLIENT_ID,
   TWITCH_CLIENT_SECRET,
   isProductionEnvironment,
