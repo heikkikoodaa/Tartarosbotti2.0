@@ -11,7 +11,10 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
-  streamAmount: [Object],
+  streamAmount: {
+    type: Number,
+    default: 0,
+  },
   twitchUrl: {
     type: String,
     default: '',

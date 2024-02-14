@@ -3,6 +3,9 @@ const router = express.Router()
 const User = require('../models/user')
 
 router.get('/:id', async (req, res) => {
+  // If id is not given, stop execution
+  if (!req.params.id) return
+
   // Get user by id
   const user = await User.findOne({ discordId: req.params.id }).lean()
 
@@ -18,36 +21,46 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   // Create new user
-  const { discordId, username } = req.body
+  const { discordId, username, twitchUrl } = req.body
 
   if (!discordId || !username) {
-    res.send({ success: false, message: 'Missing required fields' })
-    return
+    return res.send({ success: false, message: 'Missing required fields' })
   }
 
   const newUser = new User({
     discordId: discordId,
     username: username,
+    twitchUrl: twitchUrl,
   })
 
   try {
     await newUser.save()
-    res.send({ success: true, message: 'User created' })
+    res.send({ success: true, message: 'User created', user: newUser })
   } catch (error) {
-    res.send({ success: false, message: 'User could not be created' })
+    res.send({ success: false, message: 'User could not be created', errorMessage: error })
   }
 })
 
 router.patch('/:id', async (req, res) => {
-  const { isStreaming } = req.body
+  const { isStreaming: newStatus, twitchUrl } = req.body
 
   try {
-    // Update user stream status
-    await User.findOneAndUpdate(
-      { discordId: req.params.id },
-      { isStreaming: isStreaming },
-    )
-    res.send({ success: true, message: 'Stream status updated' })
+    // Find user with their DiscordId
+    const user = await User.findOne({ discordId: req.params.id })
+
+    if (user.twitchUrl !== twitchUrl) {
+      user.twitchUrl = twitchUrl
+    }
+
+    user.isStreaming = newStatus
+
+    if (newStatus) {
+      user.streamAmount += 1
+    }
+
+    await user.save()
+
+    res.send({ success: true, message: `Stream status updated to ${newStatus}` })
   } catch (error) {
     res.send({ success: false, message: 'Stream status could not be updated' })
   }
