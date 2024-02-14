@@ -3,7 +3,7 @@ const { TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET } = require('./constants')
 const { encrypt, decrypt } = require('./encryption')
 const apiClient = require('./bot_token_config')
 
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const getAuthToken = async () => {
   const clientId = TWITCH_CLIENT_ID

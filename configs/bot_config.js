@@ -1,4 +1,10 @@
-const { Client, Collection, GatewayIntentBits, ActivityType, Partials } = require('discord.js')
+const {
+  Client,
+  Collection,
+  GatewayIntentBits,
+  ActivityType,
+  Partials,
+} = require('discord.js')
 const path = require('node:path')
 const fs = require('node:fs')
 const { isProductionEnvironment, GUILD_ID } = require('./constants')
@@ -12,10 +18,7 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMembers,
   ],
-  partials: [
-    Partials.Channel,
-    Partials.Message,
-  ],
+  partials: [Partials.Channel, Partials.Message],
 })
 
 client.commands = new Collection()

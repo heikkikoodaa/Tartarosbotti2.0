@@ -27,7 +27,10 @@ const authenticateToken = (req, res, next) => {
 
   jwt.verify(token, TOKEN_SECRET, (err, payload) => {
     if (err) {
-      return res.send({ success: false, message: 'Invalid token or it has expired' })
+      return res.send({
+        success: false,
+        message: 'Invalid token or it has expired',
+      })
     }
 
     if (payload.bot_id !== BOT_ID) {
@@ -57,7 +60,9 @@ const connectToDB = async () => {
 connectToDB()
 
 const startApp = () => {
-  const server = app.listen(PORT, () => console.log(`App listening on port ${PORT}!`))
+  const server = app.listen(PORT, () =>
+    console.log(`App listening on port ${PORT}!`),
+  )
 
   const handleExit = (signal) => {
     console.log(`Received ${signal}. Closing server gracefully.`)

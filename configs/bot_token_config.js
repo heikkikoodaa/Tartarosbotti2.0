@@ -9,7 +9,7 @@ const generateToken = () => {
   const payload = {
     bot_id: BOT_ID,
   }
-  expiration = Math.floor(Date.now() / 1000) + (60 * 5)
+  expiration = Math.floor(Date.now() / 1000) + 60 * 5
   token = jwt.sign(payload, TOKEN_SECRET, { expiresIn: '5m' })
 }
 
@@ -25,12 +25,15 @@ const apiClient = axios.create({
   baseURL: BACKEND_URL,
 })
 
-apiClient.interceptors.request.use(config => {
-  const jwtToken = getToken()
-  config.headers.Authorization = `Bearer ${jwtToken}`
-  return config
-}, error => {
-  return Promise.reject(error)
-})
+apiClient.interceptors.request.use(
+  (config) => {
+    const jwtToken = getToken()
+    config.headers.Authorization = `Bearer ${jwtToken}`
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  },
+)
 
 module.exports = apiClient
