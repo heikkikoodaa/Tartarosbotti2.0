@@ -37,7 +37,11 @@ router.post('/', async (req, res) => {
     await newUser.save()
     res.send({ success: true, message: 'User created', user: newUser })
   } catch (error) {
-    res.send({ success: false, message: 'User could not be created', errorMessage: error })
+    res.send({
+      success: false,
+      message: 'User could not be created',
+      errorMessage: error,
+    })
   }
 })
 
@@ -60,7 +64,10 @@ router.patch('/:id', async (req, res) => {
 
     await user.save()
 
-    res.send({ success: true, message: `Stream status updated to ${newStatus}` })
+    res.send({
+      success: true,
+      message: `Stream status updated to ${newStatus}`,
+    })
   } catch (error) {
     res.send({ success: false, message: 'Stream status could not be updated' })
   }

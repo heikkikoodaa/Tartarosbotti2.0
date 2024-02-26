@@ -1,11 +1,12 @@
 const express = require('express')
 const mongoose = require('mongoose')
-const { MONGO_URL } = require('../configs/constants')
+const { BOT_ID, MONGO_URL, TOKEN_SECRET } = require('../configs/constants')
 const users = require('./routes/users')
-const token = require('./routes/token')
+const tokenRoute = require('./routes/token')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const helmet = require('helmet')
+const jwt = require('jsonwebtoken')
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -16,9 +17,33 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cors())
 app.use(helmet())
 
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization']
+  const token = authHeader && authHeader.split(' ')[1]
+
+  if (!token) {
+    return res.send({ success: false, message: 'No token! Unauthorized!' })
+  }
+
+  jwt.verify(token, TOKEN_SECRET, (err, payload) => {
+    if (err) {
+      return res.send({
+        success: false,
+        message: 'Invalid token or it has expired',
+      })
+    }
+
+    if (payload.bot_id !== BOT_ID) {
+      return res.send({ success: false, message: 'Unauthorized API caller!' })
+    }
+
+    next()
+  })
+}
+
 // Routes
-app.use('/users', users)
-app.use('/token', token)
+app.use('/users', authenticateToken, users)
+app.use('/token', authenticateToken, tokenRoute)
 
 const connectToDB = async () => {
   try {
@@ -35,7 +60,9 @@ const connectToDB = async () => {
 connectToDB()
 
 const startApp = () => {
-  const server = app.listen(PORT, () => console.log(`App listening on port ${PORT}!`))
+  const server = app.listen(PORT, () =>
+    console.log(`App listening on port ${PORT}!`),
+  )
 
   const handleExit = (signal) => {
     console.log(`Received ${signal}. Closing server gracefully.`)

@@ -7,7 +7,10 @@ router.post('/', async (req, res) => {
   const { iv, encryptedToken, expiresAt } = req.body
 
   if (!iv || !encryptedToken) {
-    return res.send({ success: false, message: 'Missing required token fields' })
+    return res.send({
+      success: false,
+      message: 'Missing required token fields',
+    })
   }
 
   const name = 'botToken'
@@ -20,7 +23,11 @@ router.post('/', async (req, res) => {
     )
     res.send({ success: true, message: 'Token saved', token: token })
   } catch (error) {
-    res.send({ success: false, message: 'Token could not be saved', errorMessage: error.message || error })
+    res.send({
+      success: false,
+      message: 'Token could not be saved',
+      errorMessage: error.message || error,
+    })
   }
 })
 
@@ -34,10 +41,12 @@ router.get('/', async (req, res) => {
 
     res.send({ success: true, token: token })
   } catch (error) {
-    res.send({ success: false, message: 'An error occured when fetching the token', errorMessage: error.message || error })
+    res.send({
+      success: false,
+      message: 'An error occured when fetching the token',
+      errorMessage: error.message || error,
+    })
   }
-
-
 })
 
 module.exports = router
