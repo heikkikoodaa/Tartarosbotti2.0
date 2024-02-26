@@ -19,3 +19,10 @@ steps:
     npm install
     node main.js
   displayName: 'npm install and run the code'
+- task: AzureRmWebAppDeployment@4
+  inputs:
+    ConnectionType: 'AzureRM'
+    azureSubscription: 'Heikin tilaus(bfd02933-e02f-49d8-b62a-942090d0996d)'
+    appType: 'webAppLinux'
+    WebAppName: 'tartarosbotti'
+    packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
