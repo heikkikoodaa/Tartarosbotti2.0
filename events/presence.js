@@ -174,7 +174,4 @@ const handlePresence = async (oldPresence, newPresence) => {
   }
 }
 
-module.exports = {
-  getGameInfo,
-  handlePresence,
-}
+module.exports = handlePresence
