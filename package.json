@@ -4,9 +4,9 @@
   "description": "Discord community bot to handle automatic stream announcements",
   "main": "main.js",
   "scripts": {
-    "start": "node .",
-    "dev": "nodemon .",
-    "pm": "pm2 start main-js --name 'Tartarosbotti'"
+    "start": "node main.js",
+    "dev": "nodemon main.js",
+    "pm": "pm2 start main.js --name 'Tartarosbotti'"
   },
   "author": "Heikki R",
   "license": "ISC",
