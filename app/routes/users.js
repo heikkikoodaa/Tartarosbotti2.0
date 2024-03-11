@@ -4,14 +4,17 @@ const User = require('../models/user')
 
 router.get('/:id', async (req, res) => {
   // If id is not given, stop execution
-  if (!req.params.id) return
+  if (!req.params.id) {
+    res.status(403).send({ success: false, message: 'ID param was not specified. This action is not allowed!' })
+    return
+  }
 
   // Get user by id
   const user = await User.findOne({ discordId: req.params.id }).lean()
 
   // If user does not exist, return error
   if (!user) {
-    res.send({ success: false, message: 'User not found' })
+    res.status(404).send({ success: false, message: 'User not found' })
     return
   }
 
@@ -24,7 +27,7 @@ router.post('/', async (req, res) => {
   const { discordId, username, twitchUrl } = req.body
 
   if (!discordId || !username) {
-    return res.send({ success: false, message: 'Missing required fields' })
+    return res.status(400).send({ success: false, message: 'Missing required fields' })
   }
 
   const newUser = new User({
