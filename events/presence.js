@@ -124,23 +124,23 @@ const handlePresence = async (oldPresence, newPresence) => {
    */
   const user = newPresence.user
   const userAvatar = user.avatarURL()
-  const fetchedUser = await checkUser(user)
-
-  fetchedUser.avatar = userAvatar
+  let fetchedUser
 
   let isStreamStarting = false
   let wasAlreadyStreaming = false
 
   try {
-    if (isNewActivities) {
-      for (const activity of newPresence.activities) {
-        if (activity.type === ActivityType.Streaming) {
-          fetchedUser.twitchUrl = activity.url
-          fetchedUser.streamHeading = activity.details
-          fetchedUser.streamGame = activity.state
-          isStreamStarting = true
-          break
-        }
+    if (!isNewActivities) return
+
+    for (const activity of newPresence.activities) {
+      if (activity.type === ActivityType.Streaming) {
+        fetchedUser = await checkUser(user)
+        fetchedUser.avatar = userAvatar
+        fetchedUser.twitchUrl = activity.url
+        fetchedUser.streamHeading = activity.details
+        fetchedUser.streamGame = activity.state
+        isStreamStarting = true
+        break
       }
     }
 
