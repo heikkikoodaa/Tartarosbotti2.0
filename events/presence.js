@@ -29,18 +29,16 @@ const updateStreamStatus = async (user, isStreaming) => {
       throw new TartarosError(data.message, 'Patching user information')
     }
 
-    switch (isStreaming) {
-      case true:
-        console.log(`${user.username} started streaming!`)
-        break
-      case false:
-        console.log(`${user.username} stopped streaming!`)
-        break
-      default:
-        break
+    if (isStreaming) {
+      console.log(`${user.username} started streaming!`)
+    } else {
+      console.log(`${user.username} stopped streaming!`)
     }
+
+    return true
   } catch (error) {
     console.error(error)
+    return false
   }
 }
 
@@ -86,6 +84,13 @@ const getGameInfo = async (game) => {
 }
 
 const announceStream = async (user) => {
+  if (!user.twitchUrl && !areNotificationsEnabled) {
+    console.log(`Striimin ilmoituksessa ilmeni virhe:
+      Ilmoitukset päällä: ${areNotificationsEnabled}
+      Twitch url: ${user.twitchUrl !== undefined}
+    `)
+  }
+
   const channel = client.channels.cache.get(STREAM_NOTIFICATION_CHANNEL)
   const gameData = await getGameInfo(user.streamGame)
 
@@ -112,65 +117,45 @@ const announceStream = async (user) => {
   }
 }
 
-const handlePresence = async (oldPresence, newPresence) => {
-  // Ignore if presence update is not from a user
-  if (newPresence.user.bot) return
-
-  const isNewActivities = newPresence?.activities.length > 0
-  const isOldActivities = oldPresence?.activities.length > 0
-
-  /**
-   * @type {User}
-   */
-  const user = newPresence.user
-  const userAvatar = user.avatarURL()
-  let fetchedUser
-
-  let isStreamStarting = false
-  let wasAlreadyStreaming = false
-
+const handlePresence = async (_, newPresence) => {
   try {
-    if (!isNewActivities) return
+    // Ignore if presence update is not from a user
+    if (newPresence.user.bot) return
 
-    for (const activity of newPresence.activities) {
-      if (activity.type === ActivityType.Streaming) {
-        fetchedUser = await checkUser(user)
-        fetchedUser.avatar = userAvatar
-        fetchedUser.twitchUrl = activity.url
-        fetchedUser.streamHeading = activity.details
-        fetchedUser.streamGame = activity.state
-        isStreamStarting = true
-        break
-      }
-    }
+    /**
+     * @type {User}
+     */
+    const user = newPresence.user
+    const userAvatar = user.avatarURL()
 
-    if (isOldActivities) {
-      for (const activity of oldPresence.activities) {
-        if (activity.type === ActivityType.Streaming) {
-          wasAlreadyStreaming = true
-        }
-        break
-      }
-    }
+    let isUpdateSuccessful
 
-    // Check if user is starting a stream, but ignore if isStreaming is false
-    if (!fetchedUser.isStreaming && isStreamStarting && !wasAlreadyStreaming) {
-      // Update user stream status
-      await updateStreamStatus(fetchedUser, true)
+    const newStreamingActivity = newPresence?.activities?.find(activity => activity.type === ActivityType.Streaming)
 
-      if (fetchedUser.twitchUrl && areNotificationsEnabled) {
+    if (newStreamingActivity) {
+      const fetchedUser = await checkUser(user)
+
+      if (fetchedUser.isStreaming) return
+
+      fetchedUser.avatar = userAvatar
+      fetchedUser.twitchUrl = newStreamingActivity.url
+      fetchedUser.streamHeading = newStreamingActivity.details
+      fetchedUser.streamGame = newStreamingActivity.state
+
+      isUpdateSuccessful = await updateStreamStatus(fetchedUser, true)
+
+      if (isUpdateSuccessful) {
         announceStream(fetchedUser)
       }
+    } else {
+      const fetchedUser = await checkUser(user)
 
-      return
-    }
-
-    // If user was streaming according to DB and the new presence is not streaming, the user is stopping the stream
-    if (fetchedUser.isStreaming && !isStreamStarting) {
-      await updateStreamStatus(fetchedUser, false)
+      if (fetchedUser.isStreaming) {
+        await updateStreamStatus(fetchedUser, false)
+      }
     }
   } catch (error) {
-    console.error(error.message || error)
+    console.log(`[ERROR]: handlePresence - ${error.message}`)
   }
 }
 
