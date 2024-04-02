@@ -89,6 +89,8 @@ const announceStream = async (user) => {
       Ilmoitukset päällä: ${areNotificationsEnabled}
       Twitch url: ${user.twitchUrl !== undefined}
     `)
+
+    return
   }
 
   const channel = client.channels.cache.get(STREAM_NOTIFICATION_CHANNEL)
@@ -117,7 +119,7 @@ const announceStream = async (user) => {
   }
 }
 
-const handlePresence = async (_, newPresence) => {
+const handlePresence = async (oldPresence, newPresence) => {
   try {
     // Ignore if presence update is not from a user
     if (newPresence.user.bot) return
@@ -128,9 +130,9 @@ const handlePresence = async (_, newPresence) => {
     const user = newPresence.user
     const userAvatar = user.avatarURL()
 
-    let isUpdateSuccessful
-
-    const newStreamingActivity = newPresence?.activities?.find(activity => activity.type === ActivityType.Streaming)
+    const newStreamingActivity = newPresence?.activities?.find(
+      (activity) => activity.type === ActivityType.Streaming,
+    )
 
     if (newStreamingActivity) {
       const fetchedUser = await checkUser(user)
@@ -142,17 +144,23 @@ const handlePresence = async (_, newPresence) => {
       fetchedUser.streamHeading = newStreamingActivity.details
       fetchedUser.streamGame = newStreamingActivity.state
 
-      isUpdateSuccessful = await updateStreamStatus(fetchedUser, true)
+      const isUpdateSuccessful = await updateStreamStatus(fetchedUser, true)
 
       if (isUpdateSuccessful) {
         announceStream(fetchedUser)
       }
-    } else {
+    }
+
+    const oldStreamingActivity = oldPresence?.activities?.find(
+      (activity) => activity.type === ActivityType.Streaming,
+    )
+
+    if (oldStreamingActivity && !newStreamingActivity) {
       const fetchedUser = await checkUser(user)
 
-      if (fetchedUser.isStreaming) {
-        await updateStreamStatus(fetchedUser, false)
-      }
+      if (!fetchedUser.isStreaming) return
+
+      await updateStreamStatus(fetchedUser, false)
     }
   } catch (error) {
     console.log(`[ERROR]: handlePresence - ${error.message}`)
