@@ -1,7 +1,7 @@
 require('dotenv').config()
 
 const { client, setBotActivity } = require('./configs/bot_config')
-const { BOT_TOKEN } = require('./configs/constants')
+const { BOT_TOKEN, STREAM_NOTIFICATION_CHANNEL } = require('./configs/constants')
 const { startApp } = require('./app/server')
 const handlePresence = require('./events/presence')
 
@@ -20,6 +20,25 @@ client.on('ready', () => {
 client.on('presenceUpdate', (oldPresence, newPresence) => {
   // Handle presence update
   handlePresence(oldPresence, newPresence)
+})
+
+client.on('messageCreate', message => {
+  if (message.author.bot) return
+
+  const channelId = message.channelId
+  const BASE_TWITCH_URL = 'https://twitch.tv'
+
+  if (channelId !== STREAM_NOTIFICATION_CHANNEL) return
+
+  const msg = message.content
+
+  if (!msg || !msg.startsWith('!twitch')) return
+
+  const channelName = msg.split(' ')[1]
+
+  if (!channelName) return
+
+  message.channel.send(`${BASE_TWITCH_URL}/${channelName}`)
 })
 
 client.on('interactionCreate', async (interaction) => {
