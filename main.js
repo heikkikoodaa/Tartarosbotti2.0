@@ -1,7 +1,7 @@
 require('dotenv').config()
 
 const { client, setBotActivity } = require('./configs/bot_config')
-const { BOT_TOKEN, STREAM_NOTIFICATION_CHANNEL } = require('./configs/constants')
+const { BOT_TOKEN, STREAM_NOTIFICATION_CHANNEL, TARTAROS_NOTIFICATIONS } = require('./configs/constants')
 const { startApp } = require('./app/server')
 const handlePresence = require('./events/presence')
 
@@ -27,10 +27,11 @@ client.on('messageCreate', message => {
 
   const channelId = message.channelId
   const BASE_TWITCH_URL = 'https://twitch.tv'
+  const allowedChannels = [TARTAROS_NOTIFICATIONS, STREAM_NOTIFICATION_CHANNEL]
 
-  if (channelId !== STREAM_NOTIFICATION_CHANNEL) return
+  if (!allowedChannels.includes(channelId)) return
 
-  const msg = message.content
+  const msg = message.content.toLowerCase()
 
   if (!msg || !msg.startsWith('!twitch')) return
 
