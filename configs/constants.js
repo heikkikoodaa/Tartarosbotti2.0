@@ -34,6 +34,9 @@ const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID
 const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET
 
 const TOKEN_SECRET = process.env.TOKEN_SECRET
+const TARTAROS_NOTIFICATIONS = isProductionEnvironment
+  ? process.env.TARTAROS_NOTIFICATIONS
+  : undefined
 
 // Export the bot token
 module.exports = {
@@ -45,6 +48,7 @@ module.exports = {
   ENCRYPT_PASS,
   MONGO_URL,
   STREAM_NOTIFICATION_CHANNEL,
+  TARTAROS_NOTIFICATIONS,
   TOKEN_SECRET,
   TWITCH_CLIENT_ID,
   TWITCH_CLIENT_SECRET,
