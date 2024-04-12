@@ -134,7 +134,11 @@ const handlePresence = async (oldPresence, newPresence) => {
       (activity) => activity.type === ActivityType.Streaming,
     )
 
-    if (newStreamingActivity) {
+    const oldStreamingActivity = oldPresence?.activities?.find(
+      (activity) => activity.type === ActivityType.Streaming,
+    )
+
+    if (newStreamingActivity && !oldStreamingActivity) {
       const fetchedUser = await checkUser(user)
 
       if (fetchedUser.isStreaming) return
@@ -150,10 +154,6 @@ const handlePresence = async (oldPresence, newPresence) => {
         announceStream(fetchedUser)
       }
     }
-
-    const oldStreamingActivity = oldPresence?.activities?.find(
-      (activity) => activity.type === ActivityType.Streaming,
-    )
 
     if (oldStreamingActivity && !newStreamingActivity) {
       const fetchedUser = await checkUser(user)
