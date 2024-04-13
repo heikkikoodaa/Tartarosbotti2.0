@@ -5,7 +5,7 @@ const User = require('../models/user')
 router.get('/:id', async (req, res) => {
   // If id is not given, stop execution
   if (!req.params.id) {
-    res.status(403).send({ success: false, message: 'ID param was not specified. This action is not allowed!' })
+    res.send({ success: false, message: 'ID param was not specified. This action is not allowed!' })
     return
   }
 
@@ -14,7 +14,7 @@ router.get('/:id', async (req, res) => {
 
   // If user does not exist, return error
   if (!user) {
-    res.status(404).send({ success: false, message: 'User not found' })
+    res.send({ success: false, message: 'User not found' })
     return
   }
 
@@ -27,7 +27,7 @@ router.post('/', async (req, res) => {
   const { discordId, username, twitchUrl } = req.body
 
   if (!discordId || !username) {
-    return res.status(400).send({ success: false, message: 'Missing required fields' })
+    return res.send({ success: false, message: 'Missing required fields' })
   }
 
   const newUser = new User({
