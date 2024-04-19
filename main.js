@@ -3,7 +3,7 @@ require('dotenv').config()
 const { client, setBotActivity } = require('./configs/bot_config')
 const { BOT_TOKEN, STREAM_NOTIFICATION_CHANNEL, TARTAROS_NOTIFICATIONS } = require('./configs/constants')
 const { startApp } = require('./app/server')
-const handlePresence = require('./events/presence')
+const { handlePresence } = require('./events/presence')
 
 
 client.on('ready', () => {

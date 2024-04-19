@@ -6,13 +6,15 @@
   "scripts": {
     "start": "node main.js",
     "dev": "nodemon main.js",
-    "pm": "pm2 start main.js --name 'Tartarosbotti'"
+    "pm": "pm2 start main.js --name 'Tartarosbotti'",
+    "test": "jest"
   },
   "author": "Heikki R",
   "license": "ISC",
   "devDependencies": {
     "eslint": "^8.40.0",
     "eslint-config-prettier": "^8.8.0",
+    "jest": "^29.7.0",
     "nodemon": "^3.0.3"
   },
   "dependencies": {

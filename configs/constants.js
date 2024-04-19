@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const ENVIRONMENT = process.env.ENVIRONMENT.toLowerCase()
 const isProductionEnvironment = ENVIRONMENT === 'production' ? true : false
 
