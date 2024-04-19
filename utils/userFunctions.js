@@ -41,7 +41,7 @@ const checkUser = async (user) => {
     return data.user
   } catch (error) {
     const errorMessage = error?.message || error
-    console.error(errorMessage)
+    console.error(`[ERROR - checkUser]: ${errorMessage}`)
   }
 }
 
