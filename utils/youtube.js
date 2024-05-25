@@ -7,6 +7,14 @@ const {
   YOUTUBE_CHANNEL_ID,
 } = require('../configs/constants')
 
+let intervalId
+
+// 15 minute interval
+const CHECK_INTERVAL_IN_MINUTES = 30 * 60 * 1000
+
+// 24 hour break
+const TIMEOUT_UNTIL_NEW_VIDEO_CHECK = 24 * 60 * 60 * 1000
+
 const saveLatestVideoIdToDb = async (newLatestVideoId) => {
   try {
     await apiClient.post('/videos', { videoId: newLatestVideoId })
@@ -55,10 +63,27 @@ const checkForVideos = async () => {
       await saveLatestVideoIdToDb(video.id.videoId)
     }
   } catch (error) {
+    if (error.errors.length) {
+      const youtubeError = error.errors[0]
+
+      if (youtubeError.reason === 'quotaExceeded') {
+        console.error('Daily quota exceeded. Disabling checks for 24 hours')
+        clearInterval(intervalId)
+        setTimeout(() => {
+          console.log('Resuming new video checks')
+          intervalId = setInterval(() => checkForVideos(), CHECK_INTERVAL_IN_MINUTES)
+        }, TIMEOUT_UNTIL_NEW_VIDEO_CHECK)
+      }
+
+      return
+    }
     console.log('Error checking videos from channel! ', error)
   }
 }
 
 module.exports = {
   checkForVideos,
+  startCheckingForVideos: () => {
+    intervalId = setInterval(() => checkForVideos(), CHECK_INTERVAL_IN_MINUTES)
+  },
 }

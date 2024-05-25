@@ -4,7 +4,7 @@ const { client, setBotActivity } = require('./configs/bot_config')
 const { BOT_TOKEN, STREAM_NOTIFICATION_CHANNEL, TARTAROS_NOTIFICATIONS } = require('./configs/constants')
 const { startApp } = require('./app/server')
 const { handlePresence } = require('./events/presence')
-const { checkForVideos } = require('./utils/youtube')
+const { startCheckingForVideos } = require('./utils/youtube')
 
 
 client.on('ready', () => {
@@ -17,9 +17,7 @@ client.on('ready', () => {
   // Start Express server
   startApp()
 
-  const CHECK_INTERVAL_IN_MINUTES = 15 * 60 * 1000
-
-  setInterval(checkForVideos, CHECK_INTERVAL_IN_MINUTES)
+  startCheckingForVideos()
 })
 
 client.on('presenceUpdate', (oldPresence, newPresence) => {
