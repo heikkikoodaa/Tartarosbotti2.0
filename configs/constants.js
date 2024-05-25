@@ -38,7 +38,10 @@ const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET
 const TOKEN_SECRET = process.env.TOKEN_SECRET
 const TARTAROS_NOTIFICATIONS = isProductionEnvironment
   ? process.env.TARTAROS_NOTIFICATIONS
-  : undefined
+  : process.env.TARTAROS_NOTIFICATIONS_DEV
+
+const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY
+const YOUTUBE_CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID
 
 // Export the bot token
 module.exports = {
@@ -55,4 +58,6 @@ module.exports = {
   TWITCH_CLIENT_ID,
   TWITCH_CLIENT_SECRET,
   isProductionEnvironment,
+  YOUTUBE_API_KEY,
+  YOUTUBE_CHANNEL_ID,
 }
