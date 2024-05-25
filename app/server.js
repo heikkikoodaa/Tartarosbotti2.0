@@ -1,12 +1,15 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const { BOT_ID, MONGO_URL, TOKEN_SECRET } = require('../configs/constants')
-const users = require('./routes/users')
-const tokenRoute = require('./routes/token')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const helmet = require('helmet')
 const jwt = require('jsonwebtoken')
+
+// Get routes
+const users = require('./routes/users')
+const tokenRoute = require('./routes/token')
+const videosRoute = require('./routes/videos')
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -44,6 +47,7 @@ const authenticateToken = (req, res, next) => {
 // Routes
 app.use('/users', authenticateToken, users)
 app.use('/token', authenticateToken, tokenRoute)
+app.use('/videos', authenticateToken, videosRoute)
 
 const connectToDB = async () => {
   try {
