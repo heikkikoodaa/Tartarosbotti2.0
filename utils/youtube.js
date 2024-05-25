@@ -9,7 +9,7 @@ const {
 
 let intervalId
 
-// 15 minute interval
+// 30 minute interval
 const CHECK_INTERVAL_IN_MINUTES = 30 * 60 * 1000
 
 // 24 hour break
