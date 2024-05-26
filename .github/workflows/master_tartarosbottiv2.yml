@@ -31,7 +31,7 @@ jobs:
         run: zip release.zip ./* -r
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: node-app
           path: release.zip
@@ -53,7 +53,7 @@ jobs:
 
       - name: Unzip artifact for deployment
         run: unzip release.zip
-      
+
       - name: Login to Azure
         uses: azure/login@v1
         with:
@@ -68,7 +68,7 @@ jobs:
           app-name: 'tartarosbottiv2'
           slot-name: 'Production'
           package: .
-          
+
       - name: 'Set Application Settings in Azure Web App'
         run: |
-          az webapp config appsettings set --name ${{ secrets.AZURE_APP_NAME }} --resource-group ${{ secrets.AZURE_RG_NAME }} --settings BACKEND_URL="${{ secrets.BACKEND_URL }}" MONGO_URL_PROD="${{ secrets.MONGO_URL_PROD }}" BOT_ID_PROD="${{ secrets.BOT_ID_PROD }}" ENCRYPT_PASS="${{ secrets.ENCRYPT_PASS }}" ENVIRONMENT="${{ secrets.ENVIRONMENT }}" NOTIFICATIONS_ENABLED="${{ secrets.NOTIFICATIONS_ENABLED }}" SALT="${{ secrets.SALT }}" STREAM_NOTIFICATION_CHANNEL_PROD="${{ secrets.STREAM_NOTIFICATION_CHANNEL_PROD }}" TARTAROS_NOTIFICATIONS="${{ secrets.TARTAROS_NOTIFICATIONS }}" TOKEN_SECRET="${{ secrets.TOKEN_SECRET }}" TWITCH_CLIENT_ID="${{ secrets.TWITCH_CLIENT_ID }}" TWITCH_CLIENT_SECRET="${{ secrets.TWITCH_CLIENT_SECRET }}" GUILD_ID_PROD="${{ secrets.GUILD_ID_PROD }}" BOT_TOKEN_PROD="${{ secrets.BOT_TOKEN_PROD }}"
+          az webapp config appsettings set --name ${{ secrets.AZURE_APP_NAME }} --resource-group ${{ secrets.AZURE_RG_NAME }} --settings BACKEND_URL="${{ secrets.BACKEND_URL }}" MONGO_URL_PROD="${{ secrets.MONGO_URL_PROD }}" BOT_ID_PROD="${{ secrets.BOT_ID_PROD }}" ENCRYPT_PASS="${{ secrets.ENCRYPT_PASS }}" ENVIRONMENT="${{ secrets.ENVIRONMENT }}" NOTIFICATIONS_ENABLED="${{ secrets.NOTIFICATIONS_ENABLED }}" SALT="${{ secrets.SALT }}" STREAM_NOTIFICATION_CHANNEL_PROD="${{ secrets.STREAM_NOTIFICATION_CHANNEL_PROD }}" TARTAROS_NOTIFICATIONS="${{ secrets.TARTAROS_NOTIFICATIONS }}" TOKEN_SECRET="${{ secrets.TOKEN_SECRET }}" TWITCH_CLIENT_ID="${{ secrets.TWITCH_CLIENT_ID }}" TWITCH_CLIENT_SECRET="${{ secrets.TWITCH_CLIENT_SECRET }}" GUILD_ID_PROD="${{ secrets.GUILD_ID_PROD }}" BOT_TOKEN_PROD="${{ secrets.BOT_TOKEN_PROD }}" YOUTUBE_API_KEY="${{ secrets.YOUTUBE_API_KEY }}" YOUTUBE_CHANNEL_ID="${{ secrets.YOUTUBE_CHANNEL_ID }}"

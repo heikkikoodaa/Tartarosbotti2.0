@@ -4,6 +4,7 @@ const { client, setBotActivity } = require('./configs/bot_config')
 const { BOT_TOKEN, STREAM_NOTIFICATION_CHANNEL, TARTAROS_NOTIFICATIONS } = require('./configs/constants')
 const { startApp } = require('./app/server')
 const { handlePresence } = require('./events/presence')
+const { startCheckingForVideos } = require('./utils/youtube')
 
 
 client.on('ready', () => {
@@ -15,6 +16,8 @@ client.on('ready', () => {
 
   // Start Express server
   startApp()
+
+  startCheckingForVideos()
 })
 
 client.on('presenceUpdate', (oldPresence, newPresence) => {
@@ -22,7 +25,7 @@ client.on('presenceUpdate', (oldPresence, newPresence) => {
   handlePresence(oldPresence, newPresence)
 })
 
-client.on('messageCreate', message => {
+client.on('messageCreate', async message => {
   if (message.author.bot) return
 
   const channelId = message.channelId
@@ -39,7 +42,7 @@ client.on('messageCreate', message => {
 
   if (!channelName) return
 
-  message.channel.send(`${BASE_TWITCH_URL}/${channelName}`)
+  await message.channel.send(`${BASE_TWITCH_URL}/${channelName}`)
 })
 
 client.on('interactionCreate', async (interaction) => {
