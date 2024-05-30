@@ -63,7 +63,7 @@ const checkForVideos = async () => {
       await saveLatestVideoIdToDb(video.id.videoId)
     }
   } catch (error) {
-    if (error.errors.length) {
+    if (error?.errors?.length) {
       const youtubeError = error.errors[0]
 
       if (youtubeError.reason === 'quotaExceeded') {
