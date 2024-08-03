@@ -1,11 +1,18 @@
 require('dotenv').config()
+const appInsights = require('applicationinsights')
+
+const APPLICATIONINSIGHTS_CONNECTION_STRING = process.env.APPLICATIONINSIGHTS_CONNECTION_STRING
+
+appInsights.setup(APPLICATIONINSIGHTS_CONNECTION_STRING)
+  .setAutoCollectConsole(true, true)
+  .setAutoCollectExceptions(true)
+  .start()
 
 const { client, setBotActivity } = require('./configs/bot_config')
 const { BOT_TOKEN, STREAM_NOTIFICATION_CHANNEL, TARTAROS_NOTIFICATIONS } = require('./configs/constants')
 const { startApp } = require('./app/server')
 const { handlePresence } = require('./events/presence')
 const { startCheckingForVideos } = require('./utils/youtube')
-
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`)
