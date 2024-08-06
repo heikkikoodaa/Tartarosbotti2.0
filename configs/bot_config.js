@@ -40,10 +40,10 @@ const setBotActivity = async (areNotificationsEnabled) => {
 
       console.log('Nickname successfully updated')
     } else {
-      console.error('Guild not found')
+      console.error('[Error]: Guild not found')
     }
   } catch (error) {
-    console.error(error.message)
+    console.error(`[Error]: ${error?.message}`)
   }
 }
 

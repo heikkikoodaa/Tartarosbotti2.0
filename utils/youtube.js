@@ -19,7 +19,7 @@ const saveLatestVideoIdToDb = async (newLatestVideoId) => {
   try {
     await apiClient.post('/videos', { videoId: newLatestVideoId })
   } catch (error) {
-    console.error(`Could not save new latest video: ${error}`)
+    console.error(`[Error]: Could not save new latest video: ${error}`)
   }
 }
 
@@ -30,7 +30,7 @@ const getLatestVideoId = async () => {
 
     return latestVideoId
   } catch (error) {
-    console.error('Could not fetch latest videoId from DB! ', error)
+    console.error('[Error]: Could not fetch latest videoId from DB! ', error)
   }
 }
 
@@ -67,7 +67,7 @@ const checkForVideos = async () => {
       const youtubeError = error.errors[0]
 
       if (youtubeError.reason === 'quotaExceeded') {
-        console.error('Daily quota exceeded. Disabling checks for 24 hours')
+        console.error('[Error]: Daily quota exceeded. Disabling checks for 24 hours')
         clearInterval(intervalId)
         setTimeout(() => {
           console.log('Resuming new video checks')

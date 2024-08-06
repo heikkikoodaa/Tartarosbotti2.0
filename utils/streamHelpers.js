@@ -11,14 +11,14 @@ const { EmbedBuilder } = require('discord.js')
 
 const areNotificationsEnabled = process.env.NOTIFICATIONS_ENABLED === 'true'
 
-const getGameInfo = async (game) => {
+const getGameInfo = async (gameName) => {
   try {
     const baseUrl = 'https://api.igdb.com/v4'
     const token = await getTokenFromDB()
 
     const { data } = await axios.post(
       `${baseUrl}/games`,
-      `search "${game}"; fields name, cover.url; where category = 0;`,
+      `search "${gameName}"; fields name, cover.url; where category = 0;`,
       {
         headers: {
           Accept: 'application/json',
@@ -31,7 +31,7 @@ const getGameInfo = async (game) => {
     if (data.length > 0) {
       const gameData = data[0]
 
-      if (gameData.cover.url) {
+      if (gameData?.cover?.url) {
         const originalUrl = gameData.cover.url
         let newUrl = originalUrl.startsWith('//')
           ? 'https:' + originalUrl
@@ -42,10 +42,10 @@ const getGameInfo = async (game) => {
       }
 
       return gameData
-    } else {
-      console.log('No games found with that name')
-      return null
     }
+
+    console.log('No games found with that name')
+    return null
   } catch (error) {
     console.error(`[ERROR]: Error when fetching game data - ${error}`)
     return null
@@ -76,7 +76,7 @@ const updateStreamStatus = async (user, isStreaming) => {
 
     return true
   } catch (error) {
-    console.error(error)
+    console.error(`[Error]: ${error}`)
     return false
   }
 }
@@ -106,14 +106,14 @@ const announceStream = async (user) => {
         iconURL: user.avatar,
       })
       .addFields({ name: 'Peli', value: user.streamGame || 'Tuntematon peli' })
-      .setImage(gameData.cover.url || null)
+      .setImage(gameData?.cover?.url || null)
 
     channel.send({
       content: `Mitäs tämä on? ${user.username} aloitti striimin!`,
       embeds: [streamEmbed],
     })
   } else {
-    console.error('Striimi-ilmoituskanavaa ei löytynyt!')
+    console.error('[Error]: Striimi-ilmoituskanavaa ei löytynyt!')
   }
 }
 

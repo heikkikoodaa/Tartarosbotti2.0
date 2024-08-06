@@ -96,7 +96,7 @@ const requestAndSaveToken = async () => {
     const savedToken = await saveTokenToDB(tokenData)
     return savedToken
   } else {
-    console.error('Failed to request token')
+    console.error('[Error]: Failed to request token')
     return null
   }
 }
