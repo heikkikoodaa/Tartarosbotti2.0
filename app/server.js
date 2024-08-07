@@ -5,6 +5,16 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 const helmet = require('helmet')
 const jwt = require('jsonwebtoken')
+const morgan = require('morgan')
+const appInsights = require('applicationinsights')
+
+const stream = {
+  write: (message) => {
+    message = message.trim()
+
+    appInsights.defaultClient.trackTrace({ message: message })
+  },
+}
 
 // Get routes
 const users = require('./routes/users')
@@ -15,6 +25,7 @@ const app = express()
 const PORT = process.env.PORT || 3000
 
 // Middleware
+app.use(morgan(':method :url :status :response-time ms - :res[content-length]', { stream }))
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cors())
