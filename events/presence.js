@@ -1,7 +1,14 @@
 const { checkUser } = require('../utils/userFunctions')
-const { ActivityType } = require('discord.js')
+// eslint-disable-next-line no-unused-vars
+const { ActivityType, Presence, User } = require('discord.js')
 const { announceStream, updateStreamStatus } = require('../utils/streamHelpers')
 
+/**
+ *
+ * @param {Presence} oldPresence
+ * @param {Presence} newPresence
+ * @returns Promise<void>
+ */
 const handlePresence = async (oldPresence, newPresence) => {
   try {
     // Ignore if presence update is not from a user
