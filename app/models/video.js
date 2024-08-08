@@ -5,6 +5,6 @@ const videoSchema = new Schema({
   videoId: { type: String, required: true },
 })
 
-const Token = mongoose.model('Video', videoSchema)
+const Video = mongoose.model('Video', videoSchema)
 
-module.exports = Token
+module.exports = Video
