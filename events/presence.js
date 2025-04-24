@@ -53,11 +53,10 @@ const handlePresence = async (oldPresence, newPresence) => {
       await updateStreamStatus(fetchedUser, false)
     }
   } catch (error) {
-    console.log(`[ERROR]: handlePresence - ${error.message}`)
+    console.error('[ERROR]: handlePresence failed:', error)
   }
 }
 
 module.exports = {
   handlePresence,
-  announceStream,
 }
