@@ -1,0 +1,32 @@
+const streamAnnouncements = [
+  'Laava kiehuu, sienet hehkuvat – X:n striimi on täällä taas. 🌋',
+  'Sientenkerääjien kidutus jatkuu! X avasi jälleen portit Tartarokseen! 🍄',
+  'Tartaroksen orjat eivät saa lepoa – X on taas LIVESSÄ! 🔥',
+  'Syvältä Tartaroksen onkalosta kuuluu ääniä... X on aloittanut striimin. 🕳️',
+  'Yksi sientenkerääjistä on paljastanut sienen salaisuuden – tule katsomaan, kun X striimaa! 👁️‍🗨️',
+  'X lähti taas sienijahtiin Tartaroksen syövereihin. Katso, kuinka käy! 👣',
+  'Tartaroksen orjat kutsutaan jälleen ruutujen ääreen – X on livessä. ⛓️',
+  'Striimi on alkanut. Sientenkerääjät, ette ole turvassa. 🫣',
+  'Tartaroksen perukoilta kuuluu huutoa – X on LIVE. Katso omalla vastuulla. 💀',
+  'Kuka päästikään X:n irti taas? Tartaros vapisee ja striimi on alkanut. 🧌',
+  '🍄 X on taas keräämässä Tartaroksen harvinaisimpia sieniä – tule seuraamaan metsästystä!',
+  'Sientenkerääjät ryömivät taas ulos koloistaan – X on aloittanut striimin. 🕷️',
+  'Veri, hiki ja sienet – X tuo taas tuskan ruudulle. 🩸',
+  'Outo valo syttyi taas. X on LIVESSÄ. Tule tutkimaan tätä selittämätöntä ilmiötä! 🛸',
+  'It’s dangerous to go alone – ota tämä striimi haltuun. X on aloittanut! 🔥',
+  'The cake is a lie – mutta X:n striimi on totta. Tervetuloa Tartaroksen testikammioon. 🌌',
+  'In space no one can hear you scream... mutta Tartaroksessa kaikki kuulevat X:n striimin. 🌌',
+  'X aloitti striimin. Tämä ei ole Sparta – tämä on TARTAROS! 👹',
+  'Transmission incoming... X aloitti striimin, ja Tartaros lähetti kutsun. 📡',
+  'You were expecting salvation, mutta sait X:n striimin. Sientenkerääjien toivo murskattu. 🕳️',
+  'The prophecy spoke of a stream… and X on juuri aloittanut sen. Orjat, valmistautukaa. 🔮',
+  'It’s not a bug, it’s a feature... kuten X:n striimit. 🧠',
+  'Loading... Tartaros.exe – X:n striimi on nyt käynnissä. 💾',
+  'Finish him! – X aloitti striimin ja sientenkerääjien kohtalo on sinetöity. ☠️',
+  'Kun Tartaros elää niin silloin, X striimaa. Liity rituaaliin. 🌀',
+  'Dawn of the Final Day – 24 Hours Remain. Ja X aloitti striimin. 🕰️',
+]
+
+module.exports = {
+  streamAnnouncements,
+}

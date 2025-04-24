@@ -8,6 +8,8 @@ const {
 const { getTokenFromDB } = require('../configs/token_config')
 const { client } = require('../configs/bot_config')
 const { EmbedBuilder } = require('discord.js')
+// Import the announcements
+const { streamAnnouncements } = require('./streamAnnouncements')
 
 const areNotificationsEnabled = process.env.NOTIFICATIONS_ENABLED === 'true'
 
@@ -95,6 +97,13 @@ const announceStream = async (user) => {
   const gameData = await getGameInfo(user.streamGame)
 
   if (channel) {
+    // Select a random announcement
+    const randomIndex = Math.floor(Math.random() * streamAnnouncements.length)
+    const randomAnnouncement = streamAnnouncements[randomIndex]
+
+    // Replace 'X' with the username
+    const announcementContent = randomAnnouncement.replace(/X/g, user.username)
+
     const streamEmbed = new EmbedBuilder()
       .setColor('#825791')
       .setTitle(
@@ -109,7 +118,7 @@ const announceStream = async (user) => {
       .setImage(gameData?.cover?.url || null)
 
     channel.send({
-      content: `Mitäs tämä on? ${user.username} aloitti striimin!`,
+      content: announcementContent,
       embeds: [streamEmbed],
     })
   } else {
