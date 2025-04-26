@@ -8,48 +8,86 @@ const {
 const { getTokenFromDB } = require('../configs/token_config')
 const { client } = require('../configs/bot_config')
 const { EmbedBuilder } = require('discord.js')
-// Import the announcements
 const { streamAnnouncements } = require('./streamAnnouncements')
 
 const areNotificationsEnabled = process.env.NOTIFICATIONS_ENABLED === 'true'
 
 const getGameInfo = async (gameName) => {
+  if (!gameName) {
+    console.log('No game name provided to getGameInfo.')
+    return null
+  }
+
   try {
     const baseUrl = 'https://api.igdb.com/v4'
     const token = await getTokenFromDB()
+    const headers = {
+      Accept: 'application/json',
+      'Client-ID': TWITCH_CLIENT_ID,
+      Authorization: `Bearer ${token}`,
+    }
 
-    const { data } = await axios.post(
-      `${baseUrl}/games`,
-      `search "${gameName}"; fields name, cover.url; where category = 0;`,
-      {
-        headers: {
-          Accept: 'application/json',
-          'Client-ID': TWITCH_CLIENT_ID,
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    )
+    let gameData = null
 
-    if (data.length > 0) {
-      const gameData = data[0]
+    // 1. Try finding an exact match first
+    try {
+      const exactMatchQuery = `fields name, cover.url; where name = "${gameName}" & category = 0; limit 1;`
+      const exactResponse = await axios.post(`${baseUrl}/games`, exactMatchQuery, { headers })
 
+      if (exactResponse.data.length > 0) {
+        console.log(`Found exact match for "${gameName}"`)
+        gameData = exactResponse.data[0]
+      }
+    } catch (error) {
+      console.warn(`[WARN]: Error during exact match search for "${gameName}" - ${error.message}. Falling back to search.`)
+    }
+
+    // 2. If no exact match, fall back to search and find the best fit
+    if (!gameData) {
+      console.log(`No exact match found for "${gameName}". Falling back to search.`)
+      const searchResponse = await axios.post(
+        `${baseUrl}/games`,
+        `search "${gameName}"; fields name, cover.url; where category = 0; limit 10;`,
+        { headers },
+      )
+
+      if (searchResponse.data.length > 0) {
+        const perfectMatch = searchResponse.data.find(game => game.name.toLowerCase() === gameName.toLowerCase())
+
+        if (perfectMatch) {
+          console.log(`Found perfect match within search results for "${gameName}"`)
+          gameData = perfectMatch
+        } else {
+          console.log(`No perfect match in search results for "${gameName}". Using first result.`)
+          gameData = searchResponse.data[0]
+        }
+      }
+    }
+
+    if (gameData) {
       if (gameData?.cover?.url) {
         const originalUrl = gameData.cover.url
         let newUrl = originalUrl.startsWith('//')
           ? 'https:' + originalUrl
           : originalUrl
         newUrl = newUrl.replace('t_thumb', 't_cover_big')
-
         gameData.cover.url = newUrl
       }
-
+      console.log(`Selected game: ${gameData.name}`)
       return gameData
     }
 
-    console.log('No games found with that name')
+    console.log(`No games found matching "${gameName}"`)
     return null
   } catch (error) {
-    console.error(`[ERROR]: Error when fetching game data - ${error}`)
+    if (error.response) {
+      console.error(`[ERROR]: IGDB API Error - Status: ${error.response.status}, Data: ${JSON.stringify(error.response.data)}`)
+    } else if (error.request) {
+      console.error('[ERROR]: IGDB API Error - No response received:', error.request)
+    } else {
+      console.error('[ERROR]: IGDB API Error - Request setup error:', error.message)
+    }
+    console.error(`[ERROR]: Error when fetching game data for "${gameName}" - ${error}`)
     return null
   }
 }
@@ -97,11 +135,9 @@ const announceStream = async (user) => {
   const gameData = await getGameInfo(user.streamGame)
 
   if (channel) {
-    // Select a random announcement
     const randomIndex = Math.floor(Math.random() * streamAnnouncements.length)
     const randomAnnouncement = streamAnnouncements[randomIndex]
 
-    // Replace 'X' with the username
     const announcementContent = randomAnnouncement.replace(/X/g, user.username)
 
     const streamEmbed = new EmbedBuilder()
@@ -129,4 +165,5 @@ const announceStream = async (user) => {
 module.exports = {
   announceStream,
   updateStreamStatus,
+  getGameInfo,
 }

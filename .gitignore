@@ -3,3 +3,4 @@
 temp_keys.md
 /.vscode
 .deployment
+/tests/streamHelpers.test.js
